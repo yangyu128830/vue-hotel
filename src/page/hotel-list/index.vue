@@ -129,7 +129,8 @@
           :date="currentDate" 
           :monthNumber="4" 
           v-on:asureEvent="onDateSelected" 
-          :onlyOne="roomType === 1 ? false : true"
+          v-on:dateChange="onDateChange"
+          :onlyOne="false"
           :isShowDatePicker="showDatePicker"
         ></calender>
       </div>
@@ -352,6 +353,7 @@ export default {
       if (this.tempCheckinDate && this.tempCheckoutDate) {
         this.localCheckinDate = this.tempCheckinDate
         this.localCheckoutDate = this.tempCheckoutDate
+        this.searchHotelsByDate()
       }
       this.showDatePicker = false
       this.tempCheckinDate = ''
@@ -362,6 +364,17 @@ export default {
       if (chooseDate.endDate && chooseDate.endDate.format) {
         this.tempCheckoutDate = chooseDate.endDate.format
       }
+    },
+    onDateChange (chooseDate) {
+      if (chooseDate.startDate && chooseDate.startDate.format) {
+        this.tempCheckinDate = chooseDate.startDate.format
+      }
+      if (chooseDate.endDate && chooseDate.endDate.format) {
+        this.tempCheckoutDate = chooseDate.endDate.format
+      }
+    },
+    searchHotelsByDate () {
+      console.log('根据日期查询房型:', this.localCheckinDate, this.localCheckoutDate)
     }
   },
   components: {
