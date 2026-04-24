@@ -4,9 +4,12 @@
       <div class="back-btn" @click="goBack">
         <span>←</span>
       </div>
-      <div class="header-title">
+      <div class="header-title" @click="openDatePicker">
         <div class="city-name">{{ cityName }}</div>
-        <div class="date-info">{{ checkinDate }} 至 {{ checkoutDate }} · {{ checkDays }}晚</div>
+        <div class="date-info">
+          {{ checkinDate }} 至 {{ checkoutDate }} · {{ checkDays }}晚
+          <span class="arrow">▼</span>
+        </div>
       </div>
       <div class="search-icon" @click="toggleSearchBox">
         <span>🔍</span>
@@ -113,12 +116,23 @@
       <div class="no-result-icon">🏨</div>
       <div class="no-result-text">暂无符合条件的酒店</div>
     </div>
+
+    <div v-show="showDatePicker" class="date-picker-overlay">
+      <calender 
+        :date="currentDate" 
+        :monthNumber="4" 
+        v-on:asureEvent="onDateSelected" 
+        :onlyOne="roomType === 1 ? false : true"
+        :isShowDatePicker="showDatePicker"
+      ></calender>
+    </div>
   </div>
 </template>
 
 <script>
 import moment from 'moment'
 import { mapState } from 'vuex'
+import Calender from '@/common/calender'
 
 export default {
   name: 'HotelList',
@@ -128,8 +142,11 @@ export default {
       searchKeyword: '',
       showSortDropdown: false,
       showLocationDropdown: false,
+      showDatePicker: false,
       sortBy: '',
       selectedLocation: '',
+      localCheckinDate: '',
+      localCheckoutDate: '',
       nearbyLocations: [
         { id: 'center', name: '市中心' },
         { id: 'railway', name: '火车站' },
@@ -233,19 +250,23 @@ export default {
     ...mapState({
       city: 'city',
       checkinDateStore: 'checkinDate',
-      checkoutDateStore: 'checkoutDate'
+      checkoutDateStore: 'checkoutDate',
+      roomType: 'roomType'
     }),
     cityName () {
       return this.$route.query.cityName || this.city.cityName || '北京'
     },
     checkinDate () {
-      return this.$route.query.checkinDate || this.checkinDateStore || '2026-04-24'
+      return this.localCheckinDate || this.$route.query.checkinDate || this.checkinDateStore || '2026-04-24'
     },
     checkoutDate () {
-      return this.$route.query.checkoutDate || this.checkoutDateStore || '2026-04-25'
+      return this.localCheckoutDate || this.$route.query.checkoutDate || this.checkoutDateStore || '2026-04-25'
     },
     checkDays () {
       return (moment(this.checkoutDate).format('X') - moment(this.checkinDate).format('X')) / (24 * 60 * 60)
+    },
+    currentDate () {
+      return new Date(this.checkinDate)
     },
     filteredHotels () {
       let result = [...this.hotels]
@@ -288,10 +309,12 @@ export default {
     toggleSortDropdown () {
       this.showSortDropdown = !this.showSortDropdown
       this.showLocationDropdown = false
+      this.showDatePicker = false
     },
     toggleLocationDropdown () {
       this.showLocationDropdown = !this.showLocationDropdown
       this.showSortDropdown = false
+      this.showDatePicker = false
     },
     selectSort (sortType) {
       this.sortBy = sortType
@@ -300,7 +323,22 @@ export default {
     selectLocation (locationId) {
       this.selectedLocation = locationId
       this.showLocationDropdown = false
+    },
+    openDatePicker () {
+      this.showDatePicker = !this.showDatePicker
+      this.showSortDropdown = false
+      this.showLocationDropdown = false
+    },
+    onDateSelected (chooseDate) {
+      this.showDatePicker = false
+      this.localCheckinDate = chooseDate.startDate.format
+      if (chooseDate.endDate && chooseDate.endDate.format) {
+        this.localCheckoutDate = chooseDate.endDate.format
+      }
     }
+  },
+  components: {
+    Calender
   }
 }
 </script>
@@ -333,6 +371,7 @@ export default {
     .header-title
       flex: 1
       text-align: center
+      cursor: pointer
 
       .city-name
         font-size: px2rem(36px)
@@ -343,6 +382,14 @@ export default {
         font-size: px2rem(24px)
         color: #666
         margin-top: px2rem(5px)
+        display: flex
+        align-items: center
+        justify-content: center
+
+        .arrow
+          margin-left: px2rem(10px)
+          font-size: px2rem(20px)
+          transition: transform 0.3s
 
     .search-icon
       width: px2rem(80px)
@@ -538,4 +585,12 @@ export default {
     .no-result-text
       font-size: px2rem(32px)
       color: #999
+
+  .date-picker-overlay
+    position: fixed
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+    z-index: 9999
 </style>
