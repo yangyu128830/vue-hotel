@@ -1,6 +1,5 @@
 <template>
   <div class="index">
-    <slide></slide>
     <search></search>
     <city :scrollLetter="scrollLetter"></city>
     <datepicker></datepicker>
@@ -153,7 +152,6 @@
 </template>
 
 <script>
-import Slide from '@/page/index/children/Slide'
 import Search from '@/page/index/children/Search'
 import City from '@/page/index/children/City/index'
 import Datepicker from '@/page/index/children/Datepicker'
@@ -363,7 +361,6 @@ export default {
     }
   },
   components: {
-    Slide,
     Search,
     City,
     Datepicker,
@@ -378,12 +375,12 @@ export default {
 
 .index
   background-color: #f5f5f5
-  padding-bottom: px2rem(40px)
+  padding-bottom: px2rem(20px)
 
 .section-container
   background-color: #fff
-  margin-top: px2rem(20px)
-  padding: px2rem(30px) px2rem(20px)
+  margin-top: px2rem(12px)
+  padding: px2rem(20px) px2rem(16px)
 
   .section-header
     display: flex
