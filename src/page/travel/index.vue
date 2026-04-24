@@ -4,28 +4,65 @@
       <div class="back-btn" @click="goBack">
         <span>←</span>
       </div>
-      <div class="location-section">
-        <div class="location-icon">📍</div>
-        <div class="location-info">
-          <div class="location-label">当前位置</div>
-          <div class="location-name">{{ currentCity }} · {{ currentDistrict }}</div>
+      <div class="header-content">
+        <div class="location-section" @click="toggleCityDropdown">
+          <div class="location-icon">📍</div>
+          <div class="location-info">
+            <div class="location-label">当前位置</div>
+            <div class="location-name">{{ currentCity }}</div>
+          </div>
+          <div class="location-arrow" :class="{ up: showCityDropdown }">▼</div>
         </div>
-        <div class="location-arrow">▼</div>
-      </div>
-      <div class="search-icon" @click="toggleSearchBox">
-        <span>🔍</span>
+        <div class="search-section">
+          <div class="search-icon-inline">🔍</div>
+          <input 
+            type="text" 
+            v-model="searchKeyword" 
+            placeholder="搜索景点、门票、游玩项目" 
+            class="search-input-inline"
+            @input="searchAttractions"
+          />
+        </div>
       </div>
     </div>
 
-    <div class="search-box" v-show="showSearchBox">
-      <input 
-        type="text" 
-        v-model="searchKeyword" 
-        placeholder="搜索景点、门票、游玩项目" 
-        class="search-input"
-        @input="searchAttractions"
-      />
-      <button class="cancel-btn" @click="cancelSearch">取消</button>
+    <div class="city-dropdown-overlay" v-show="showCityDropdown" @click="closeCityDropdown">
+      <div class="city-dropdown" @click.stop>
+        <div class="city-dropdown-header">
+          <span class="city-dropdown-title">选择城市</span>
+          <span class="city-dropdown-close" @click="closeCityDropdown">✕</span>
+        </div>
+        <div class="city-dropdown-content">
+          <div class="city-group">
+            <div class="city-group-title">热门城市</div>
+            <div class="hot-cities">
+              <div 
+                v-for="city in hotCities" 
+                :key="city.id"
+                class="hot-city-item"
+                :class="{ active: currentCity === city.name }"
+                @click="selectCity(city)"
+              >
+                {{ city.name }}
+              </div>
+            </div>
+          </div>
+          <div class="city-group">
+            <div class="city-group-title">全部城市</div>
+            <div class="all-cities">
+              <div 
+                v-for="city in allCities" 
+                :key="city.id"
+                class="city-item"
+                :class="{ active: currentCity === city.name }"
+                @click="selectCity(city)"
+              >
+                {{ city.name }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="special-deals-section">
@@ -218,7 +255,7 @@ export default {
     return {
       currentCity: '北京',
       currentDistrict: '朝阳区',
-      showSearchBox: false,
+      showCityDropdown: false,
       searchKeyword: '',
       showDistanceDropdown: false,
       showTimeDropdown: false,
@@ -227,6 +264,34 @@ export default {
       showFreeOnly: false,
       activeRankingTab: 0,
       rankingTabs: ['综合评分', '人气最热', '好评优先', '低价精选'],
+      hotCities: [
+        { id: 1, name: '北京' },
+        { id: 2, name: '上海' },
+        { id: 3, name: '广州' },
+        { id: 4, name: '深圳' },
+        { id: 5, name: '杭州' },
+        { id: 6, name: '成都' },
+        { id: 7, name: '西安' },
+        { id: 8, name: '南京' }
+      ],
+      allCities: [
+        { id: 1, name: '北京' },
+        { id: 2, name: '上海' },
+        { id: 3, name: '广州' },
+        { id: 4, name: '深圳' },
+        { id: 5, name: '杭州' },
+        { id: 6, name: '成都' },
+        { id: 7, name: '西安' },
+        { id: 8, name: '南京' },
+        { id: 9, name: '武汉' },
+        { id: 10, name: '重庆' },
+        { id: 11, name: '天津' },
+        { id: 12, name: '苏州' },
+        { id: 13, name: '厦门' },
+        { id: 14, name: '三亚' },
+        { id: 15, name: '青岛' },
+        { id: 16, name: '大连' }
+      ],
       distanceOptions: [
         { value: '', label: '全部' },
         { value: '1', label: '1公里内' },
@@ -472,15 +537,16 @@ export default {
     goBack () {
       this.$router.go(-1)
     },
-    toggleSearchBox () {
-      this.showSearchBox = !this.showSearchBox
-      if (!this.showSearchBox) {
-        this.searchKeyword = ''
-      }
+    toggleCityDropdown () {
+      this.showCityDropdown = !this.showCityDropdown
     },
-    cancelSearch () {
-      this.showSearchBox = false
-      this.searchKeyword = ''
+    closeCityDropdown () {
+      this.showCityDropdown = false
+    },
+    selectCity (city) {
+      this.currentCity = city.name
+      this.closeCityDropdown()
+      console.log('选择城市:', city.name)
     },
     searchAttractions () {
       console.log('搜索景点:', this.searchKeyword)
@@ -553,28 +619,34 @@ export default {
       font-size: px2rem(40px)
       color: #333
       cursor: pointer
+      flex-shrink: 0
 
-    .location-section
+    .header-content
       flex: 1
       display: flex
+      flex-direction: column
+      margin-left: px2rem(15px)
+      gap: px2rem(15px)
+
+    .location-section
+      display: flex
       align-items: center
-      padding: px2rem(15px) px2rem(20px)
+      padding: px2rem(12px) px2rem(16px)
       background-color: #f8f8f8
       border-radius: px2rem(8px)
-      margin: 0 px2rem(15px)
       cursor: pointer
 
       .location-icon
-        font-size: px2rem(36px)
-        margin-right: px2rem(12px)
+        font-size: px2rem(32px)
+        margin-right: px2rem(10px)
 
       .location-info
         flex: 1
 
         .location-label
-          font-size: px2rem(22px)
+          font-size: px2rem(20px)
           color: #999
-          margin-bottom: px2rem(4px)
+          margin-bottom: px2rem(2px)
 
         .location-name
           font-size: px2rem(28px)
@@ -582,44 +654,126 @@ export default {
           color: #333
 
       .location-arrow
-        font-size: px2rem(20px)
+        font-size: px2rem(18px)
         color: #999
+        transition: transform 0.3s
 
-    .search-icon
-      width: px2rem(80px)
-      height: px2rem(80px)
+        &.up
+          transform: rotate(180deg)
+
+    .search-section
       display: flex
       align-items: center
-      justify-content: center
-      font-size: px2rem(36px)
-      cursor: pointer
-
-  .search-box
-    display: flex
-    align-items: center
-    padding: px2rem(20px)
-    background-color: #fff
-    border-bottom: 1px solid #eee
-
-    .search-input
-      flex: 1
-      height: px2rem(70px)
-      padding: 0 px2rem(20px)
-      border: 1px solid #ddd
+      background-color: #f5f5f5
       border-radius: px2rem(35px)
-      font-size: px2rem(28px)
-      outline: none
+      padding: px2rem(12px) px2rem(20px)
 
-      &:focus
-        border-color: #06c1ae
+      .search-icon-inline
+        font-size: px2rem(32px)
+        margin-right: px2rem(12px)
+        color: #999
 
-    .cancel-btn
-      margin-left: px2rem(20px)
-      font-size: px2rem(28px)
-      color: #06c1ae
-      background: none
-      border: none
-      cursor: pointer
+      .search-input-inline
+        flex: 1
+        border: none
+        background: transparent
+        font-size: px2rem(26px)
+        color: #333
+        outline: none
+
+        &::placeholder
+          color: #999
+
+  .city-dropdown-overlay
+    position: fixed
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+    background-color: rgba(0, 0, 0, 0.5)
+    z-index: 1000
+    display: flex
+    align-items: flex-end
+
+    .city-dropdown
+      width: 100%
+      max-height: 80vh
+      background-color: #fff
+      border-top-left-radius: px2rem(20px)
+      border-top-right-radius: px2rem(20px)
+      overflow: hidden
+
+      .city-dropdown-header
+        display: flex
+        justify-content: space-between
+        align-items: center
+        padding: px2rem(25px) px2rem(30px)
+        border-bottom: 1px solid #eee
+
+        .city-dropdown-title
+          font-size: px2rem(32px)
+          font-weight: bold
+          color: #333
+
+        .city-dropdown-close
+          font-size: px2rem(36px)
+          color: #999
+          cursor: pointer
+          padding: px2rem(10px)
+
+      .city-dropdown-content
+        padding: px2rem(25px) px2rem(30px)
+        max-height: calc(80vh - px2rem(100px))
+        overflow-y: auto
+
+        .city-group
+          margin-bottom: px2rem(30px)
+
+          &:last-child
+            margin-bottom: 0
+
+          .city-group-title
+            font-size: px2rem(26px)
+            color: #999
+            margin-bottom: px2rem(20px)
+
+        .hot-cities
+          display: flex
+          flex-wrap: wrap
+          gap: px2rem(15px)
+
+          .hot-city-item
+            padding: px2rem(15px) px2rem(30px)
+            background-color: #f8f8f8
+            border-radius: px2rem(8px)
+            font-size: px2rem(28px)
+            color: #333
+            cursor: pointer
+            transition: all 0.2s
+
+            &:hover
+              background-color: #f0f9f8
+
+            &.active
+              background-color: rgba(6, 193, 174, 0.1)
+              color: #06c1ae
+
+        .all-cities
+          display: flex
+          flex-direction: column
+
+          .city-item
+            padding: px2rem(20px) 0
+            font-size: px2rem(28px)
+            color: #333
+            cursor: pointer
+            border-bottom: 1px solid #f5f5f5
+
+            &:last-child
+              border-bottom: none
+
+            &.active
+              color: #06c1ae
 
   .section-header
     display: flex
