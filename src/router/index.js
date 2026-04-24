@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Index from '@/page/index/Index'
 import HotelList from '@/page/hotel-list/index'
+import HotelDetail from '@/page/hotel-detail/index'
 
 Vue.use(Router)
 
@@ -17,6 +18,11 @@ export default new Router({
       path: '/hotel-list',
       name: 'HotelList',
       component: HotelList
+    },
+    {
+      path: '/hotel-detail/:hotelId',
+      name: 'HotelDetail',
+      component: HotelDetail
     }
   ]
 })
