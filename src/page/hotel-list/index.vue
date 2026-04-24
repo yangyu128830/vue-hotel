@@ -118,13 +118,21 @@
     </div>
 
     <div v-show="showDatePicker" class="date-picker-overlay">
-      <calender 
-        :date="currentDate" 
-        :monthNumber="4" 
-        v-on:asureEvent="onDateSelected" 
-        :onlyOne="roomType === 1 ? false : true"
-        :isShowDatePicker="showDatePicker"
-      ></calender>
+      <div class="date-picker-mask" @click="cancelDatePicker"></div>
+      <div class="date-picker-header" @click.stop>
+        <div class="date-picker-cancel" @click="cancelDatePicker">取消</div>
+        <div class="date-picker-title">选择入住离店日期</div>
+        <div class="date-picker-confirm" @click="confirmDatePicker">确定</div>
+      </div>
+      <div class="date-picker-calendar-wrapper" @click.stop>
+        <calender 
+          :date="currentDate" 
+          :monthNumber="4" 
+          v-on:asureEvent="onDateSelected" 
+          :onlyOne="roomType === 1 ? false : true"
+          :isShowDatePicker="showDatePicker"
+        ></calender>
+      </div>
     </div>
   </div>
 </template>
@@ -147,6 +155,8 @@ export default {
       selectedLocation: '',
       localCheckinDate: '',
       localCheckoutDate: '',
+      tempCheckinDate: '',
+      tempCheckoutDate: '',
       nearbyLocations: [
         { id: 'center', name: '市中心' },
         { id: 'railway', name: '火车站' },
@@ -328,12 +338,29 @@ export default {
       this.showDatePicker = !this.showDatePicker
       this.showSortDropdown = false
       this.showLocationDropdown = false
+      if (this.showDatePicker) {
+        this.tempCheckinDate = this.checkinDate
+        this.tempCheckoutDate = this.checkoutDate
+      }
+    },
+    cancelDatePicker () {
+      this.showDatePicker = false
+      this.tempCheckinDate = ''
+      this.tempCheckoutDate = ''
+    },
+    confirmDatePicker () {
+      if (this.tempCheckinDate && this.tempCheckoutDate) {
+        this.localCheckinDate = this.tempCheckinDate
+        this.localCheckoutDate = this.tempCheckoutDate
+      }
+      this.showDatePicker = false
+      this.tempCheckinDate = ''
+      this.tempCheckoutDate = ''
     },
     onDateSelected (chooseDate) {
-      this.showDatePicker = false
-      this.localCheckinDate = chooseDate.startDate.format
+      this.tempCheckinDate = chooseDate.startDate.format
       if (chooseDate.endDate && chooseDate.endDate.format) {
-        this.localCheckoutDate = chooseDate.endDate.format
+        this.tempCheckoutDate = chooseDate.endDate.format
       }
     }
   },
@@ -593,4 +620,63 @@ export default {
     right: 0
     bottom: 0
     z-index: 9999
+
+    .date-picker-mask
+      position: fixed
+      top: 0
+      left: 0
+      right: 0
+      bottom: 0
+      background: rgba(0, 0, 0, 0.7)
+      z-index: 9998
+
+    .date-picker-header
+      position: fixed
+      top: 0
+      left: 0
+      right: 0
+      height: px2rem(90px)
+      background: #fff
+      display: flex
+      align-items: center
+      justify-content: space-between
+      padding: 0 px2rem(20px)
+      z-index: 10001
+      border-bottom: 1px solid #eee
+
+      .date-picker-cancel
+        font-size: px2rem(28px)
+        color: #666
+        padding: px2rem(10px)
+        cursor: pointer
+
+      .date-picker-title
+        font-size: px2rem(32px)
+        font-weight: bold
+        color: #333
+
+      .date-picker-confirm
+        font-size: px2rem(28px)
+        color: #06c1ae
+        padding: px2rem(10px)
+        cursor: pointer
+
+    .date-picker-calendar-wrapper
+      position: fixed
+      top: 0
+      left: 0
+      right: 0
+      bottom: 0
+      z-index: 10000
+
+    .vue-calendar
+      z-index: 10000
+
+      .vue-calendar-content
+        top: px2rem(90px)
+        height: calc(100% - px2rem(90px))
+        z-index: 10000
+
+      .vue-calendar-backdrop
+        display: none
 </style>
