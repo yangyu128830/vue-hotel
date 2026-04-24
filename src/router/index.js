@@ -19,7 +19,7 @@ const PlaceholderPage = {
 }
 
 export default new Router({
-  mode: 'history',
+  mode: 'hash',
   routes: [
     {
       path: '/',
