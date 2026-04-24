@@ -20,11 +20,13 @@
             v-model="searchKeyword" 
             placeholder="搜索景点、门票、游玩项目" 
             class="search-input-inline"
-            @input="searchAttractions"
             @focus="showSearchSuggestion"
-            @keyup.enter="confirmSearch"
+            @keyup.enter="doSearch"
           />
           <div class="search-clear-btn" v-show="searchKeyword" @click="clearSearch">✕</div>
+        </div>
+        <div class="search-btn" @click="doSearch">
+          <span class="search-btn-text">搜索</span>
         </div>
       </div>
     </div>
@@ -67,7 +69,7 @@
             v-for="(suggestion, index) in searchSuggestions" 
             :key="index" 
             class="search-suggestion-item"
-            @click="goToAttractionDetail(suggestion)"
+            @click="selectSuggestion(suggestion)"
           >
             <span class="suggestion-icon">📍</span>
             <span class="suggestion-text">{{ suggestion.name }}</span>
@@ -629,11 +631,11 @@ export default {
     searchAttractions () {
       console.log('搜索景点:', this.searchKeyword)
     },
-    confirmSearch () {
+    doSearch () {
       if (this.searchKeyword.trim()) {
         this.addToHistory(this.searchKeyword.trim())
-        this.hideSearchSuggestion()
       }
+      this.hideSearchSuggestion()
     },
     searchByTag (tag) {
       this.searchKeyword = tag
@@ -642,6 +644,12 @@ export default {
     },
     searchByHistory (history) {
       this.searchKeyword = history
+      this.addToHistory(history)
+      this.hideSearchSuggestion()
+    },
+    selectSuggestion (suggestion) {
+      this.searchKeyword = suggestion.name
+      this.addToHistory(suggestion.name)
       this.hideSearchSuggestion()
     },
     addToHistory (keyword) {
@@ -862,6 +870,25 @@ export default {
         color: #999
         cursor: pointer
         padding: px2rem(10px)
+
+    .search-btn
+      display: flex
+      align-items: center
+      justify-content: center
+      padding: px2rem(12px) px2rem(30px)
+      background-color: #06c1ae
+      border-radius: px2rem(35px)
+      cursor: pointer
+      margin-left: px2rem(15px)
+      transition: all 0.2s
+
+      &:hover
+        background-color: #05a897
+
+      .search-btn-text
+        font-size: px2rem(28px)
+        font-weight: bold
+        color: #fff
 
   .search-suggestion-overlay
     position: fixed
