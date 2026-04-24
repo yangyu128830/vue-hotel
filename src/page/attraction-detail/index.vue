@@ -248,7 +248,7 @@
       </div>
     </div>
 
-    <div v-show="selectedTicket" class="bottom-bar">
+    <div v-if="selectedTicket" class="bottom-bar">
       <div class="bottom-price">
         <div class="selected-ticket-name">{{ selectedTicket.name }}</div>
         <div class="selected-ticket-price">
