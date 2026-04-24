@@ -5,6 +5,7 @@ import HotelList from '@/page/hotel-list/index'
 import HotelDetail from '@/page/hotel-detail/index'
 import Travel from '@/page/travel/index'
 import AttractionDetail from '@/page/attraction-detail/index'
+import Food from '@/page/food/index'
 
 Vue.use(Router)
 
@@ -53,7 +54,7 @@ export default new Router({
     {
       path: '/food',
       name: 'Food',
-      component: PlaceholderPage
+      component: Food
     },
     {
       path: '/member',
