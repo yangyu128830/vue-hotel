@@ -1185,7 +1185,7 @@ export default {
               background-color: #f0f9f8
 
             &.active
-              background-color: rgba(255, 107, 0, 0.1)
+              background-color: rgba(6, 193, 174, 0.1)
               color: #06c1ae
 
         .all-cities
@@ -1424,7 +1424,7 @@ export default {
             background-color: #f0f9f8
 
           &.active
-            background-color: rgba(255, 107, 0, 0.1)
+            background-color: rgba(6, 193, 174, 0.1)
 
             .category-icon
               transform: scale(1.1)
@@ -1518,7 +1518,7 @@ export default {
         &.active
           color: #06c1ae
           font-weight: bold
-          background-color: rgba(255, 107, 0, 0.05)
+          background-color: rgba(6, 193, 174, 0.05)
 
     .food-list
       display: flex
@@ -1617,7 +1617,7 @@ export default {
           .food-tag
             font-size: px2rem(22px)
             color: #06c1ae
-            background-color: rgba(255, 107, 0, 0.1)
+            background-color: rgba(6, 193, 174, 0.1)
             padding: px2rem(4px) px2rem(12px)
             border-radius: px2rem(4px)
 
@@ -1663,7 +1663,7 @@ export default {
           .coupon-info
             display: flex
             align-items: center
-            background-color: rgba(255, 107, 0, 0.1)
+            background-color: rgba(6, 193, 174, 0.1)
             padding: px2rem(8px) px2rem(15px)
             border-radius: px2rem(20px)
 
@@ -1888,3 +1888,4 @@ export default {
 
     .toast-text
       font-weight: bold
+</style>
