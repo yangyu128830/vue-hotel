@@ -321,7 +321,7 @@
       </div>
     </div>
 
-    <div class="toast" :class="{ show: showToast }">
+    <div class="toast" :class="{ show: showToastVisible }">
       <span class="toast-icon">{{ toastIcon }}</span>
       <span class="toast-text">{{ toastMessage }}</span>
     </div>
@@ -349,9 +349,15 @@ export default {
       activeCategoryTab: 0,
       showCouponModal: false,
       couponClaimSuccess: false,
-      selectedCoupon: null,
+      selectedCoupon: {
+        id: 0,
+        name: '',
+        value: 0,
+        minAmount: 0,
+        validUntil: ''
+      },
       claimedCoupons: [],
-      showToast: false,
+      showToastVisible: false,
       toastMessage: '',
       toastIcon: '✅',
       hotCities: [
@@ -860,10 +866,10 @@ export default {
     showToast (icon, message) {
       this.toastIcon = icon
       this.toastMessage = message
-      this.showToast = true
+      this.showToastVisible = true
 
       setTimeout(() => {
-        this.showToast = false
+        this.showToastVisible = false
       }, 2000)
     }
   }
@@ -971,14 +977,14 @@ export default {
       align-items: center
       justify-content: center
       padding: px2rem(12px) px2rem(30px)
-      background-color: #ff6b00
+      background-color: #06c1ae
       border-radius: px2rem(35px)
       cursor: pointer
       margin-left: px2rem(15px)
       transition: all 0.2s
 
       &:hover
-        background-color: #e65c00
+        background-color: #05a897
 
       .search-btn-text
         font-size: px2rem(28px)
@@ -1041,8 +1047,8 @@ export default {
           transition: all 0.2s
 
           &:hover
-            background-color: #fff5f0
-            color: #ff6b00
+            background-color: #f0f9f8
+            color: #06c1ae
 
       .search-history-list
         margin-bottom: px2rem(10px)
@@ -1176,11 +1182,11 @@ export default {
             transition: all 0.2s
 
             &:hover
-              background-color: #fff5f0
+              background-color: #f0f9f8
 
             &.active
               background-color: rgba(255, 107, 0, 0.1)
-              color: #ff6b00
+              color: #06c1ae
 
         .all-cities
           display: flex
@@ -1197,7 +1203,7 @@ export default {
               border-bottom: none
 
             &.active
-              color: #ff6b00
+              color: #06c1ae
 
   .section-header
     display: flex
@@ -1220,12 +1226,12 @@ export default {
         transform: translateY(-50%)
         width: px2rem(8px)
         height: px2rem(32px)
-        background-color: #ff6b00
+        background-color: #06c1ae
         border-radius: px2rem(4px)
 
     .section-more
       font-size: px2rem(28px)
-      color: #ff6b00
+      color: #06c1ae
       cursor: pointer
 
   .coupon-section
@@ -1261,7 +1267,7 @@ export default {
         opacity: 0.6
 
       .coupon-left
-        background: linear-gradient(135deg, #ff6b00, #ff9800)
+        background: linear-gradient(135deg, #06c1ae, #05a897)
         border-radius: px2rem(12px) 0 0 px2rem(12px)
         padding: px2rem(25px) px2rem(20px)
         display: flex
@@ -1367,7 +1373,7 @@ export default {
           margin-bottom: px2rem(15px)
 
         .coupon-btn
-          background-color: #ff6b00
+          background-color: #06c1ae
           color: #fff
           padding: px2rem(10px) px2rem(20px)
           border-radius: px2rem(25px)
@@ -1377,7 +1383,7 @@ export default {
           transition: all 0.2s
 
           &:hover
-            background-color: #e65c00
+            background-color: #05a897
 
           &.disabled
             background-color: #ccc
@@ -1415,7 +1421,7 @@ export default {
             margin-right: 0
 
           &:hover
-            background-color: #fff5f0
+            background-color: #f0f9f8
 
           &.active
             background-color: rgba(255, 107, 0, 0.1)
@@ -1424,7 +1430,7 @@ export default {
               transform: scale(1.1)
 
             .category-name
-              color: #ff6b00
+              color: #06c1ae
               font-weight: bold
 
           .category-icon
@@ -1468,10 +1474,10 @@ export default {
         &.active
           background-color: #fff
           font-weight: bold
-          color: #ff6b00
+          color: #06c1ae
 
         span.active
-          color: #ff6b00
+          color: #06c1ae
           font-weight: bold
 
         .arrow
@@ -1507,10 +1513,10 @@ export default {
           border-bottom: none
 
         &:hover
-          background-color: #fff5f0
+          background-color: #f0f9f8
 
         &.active
-          color: #ff6b00
+          color: #06c1ae
           font-weight: bold
           background-color: rgba(255, 107, 0, 0.05)
 
@@ -1528,7 +1534,7 @@ export default {
       transition: background-color 0.3s
 
       &:hover
-        background-color: #fff5f0
+        background-color: #f0f9f8
 
       .food-image
         width: px2rem(200px)
@@ -1558,7 +1564,7 @@ export default {
           position: absolute
           bottom: px2rem(12px)
           left: px2rem(12px)
-          background: linear-gradient(135deg, #ff6b00, #ff9800)
+          background: linear-gradient(135deg, #06c1ae, #05a897)
           color: #fff
           font-size: px2rem(20px)
           padding: px2rem(4px) px2rem(12px)
@@ -1590,7 +1596,7 @@ export default {
           .rating-value
             font-size: px2rem(28px)
             font-weight: bold
-            color: #ff9800
+            color: #05a897
             margin-right: px2rem(8px)
 
           .rating-count
@@ -1600,7 +1606,7 @@ export default {
 
           .order-count
             font-size: px2rem(22px)
-            color: #ff6b00
+            color: #06c1ae
 
         .food-tags
           display: flex
@@ -1610,7 +1616,7 @@ export default {
 
           .food-tag
             font-size: px2rem(22px)
-            color: #ff6b00
+            color: #06c1ae
             background-color: rgba(255, 107, 0, 0.1)
             padding: px2rem(4px) px2rem(12px)
             border-radius: px2rem(4px)
@@ -1640,13 +1646,13 @@ export default {
 
             .price-symbol
               font-size: px2rem(24px)
-              color: #ff6b00
+              color: #06c1ae
               margin-right: px2rem(4px)
 
             .price-value
               font-size: px2rem(40px)
               font-weight: bold
-              color: #ff6b00
+              color: #06c1ae
 
             .original-price
               font-size: px2rem(24px)
@@ -1667,7 +1673,7 @@ export default {
 
             span:last-child
               font-size: px2rem(22px)
-              color: #ff6b00
+              color: #06c1ae
 
   .no-result
     display: flex
@@ -1744,7 +1750,7 @@ export default {
             opacity: 0.6
 
           .coupon-preview-left
-            background: linear-gradient(135deg, #ff6b00, #ff9800)
+            background: linear-gradient(135deg, #06c1ae, #05a897)
             padding: px2rem(35px) px2rem(30px)
             display: flex
             flex-direction: column
@@ -1838,7 +1844,7 @@ export default {
         border-top: 1px solid #eee
 
         .modal-btn
-          background-color: #ff6b00
+          background-color: #06c1ae
           color: #fff
           padding: px2rem(25px)
           border-radius: px2rem(10px)
@@ -1849,7 +1855,7 @@ export default {
           transition: all 0.2s
 
           &:hover
-            background-color: #e65c00
+            background-color: #05a897
 
           &.disabled
             background-color: #ccc
