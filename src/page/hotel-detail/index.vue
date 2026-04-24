@@ -101,12 +101,12 @@
         >
           <div class="room-image">
             <img :src="room.image" :alt="room.name" />
-            <div v-if="selectedRoom && selectedRoom.id === room.id" class="selected-badge">
-              <span>✓ 已选择</span>
-            </div>
           </div>
           <div class="room-info">
-            <div class="room-name">{{ room.name }}</div>
+            <div class="room-name">
+              {{ room.name }}
+              <span v-if="selectedRoom && selectedRoom.id === room.id" class="selected-badge">已选择</span>
+            </div>
             <div class="room-size">{{ room.size }} | {{ room.bedType }}</div>
             <div class="room-facilities">
               <span v-for="facility in room.facilities" :key="facility" class="facility-tag">{{ facility }}</span>
@@ -120,7 +120,7 @@
               <button 
                 class="book-btn" 
                 :class="{ selected: selectedRoom && selectedRoom.id === room.id }"
-                @click.stop="bookRoom(room)"
+                @click.stop="toggleRoomSelection(room)"
               >
                 {{ selectedRoom && selectedRoom.id === room.id ? '已选择' : '选择' }}
               </button>
@@ -193,17 +193,16 @@
       </div>
     </div>
 
-    <div v-if="selectedRoom" class="bottom-bar">
-      <div class="bottom-room-info">
-        <div class="bottom-room-name">{{ selectedRoom.name }}</div>
-        <div class="bottom-room-detail">{{ selectedRoom.size }} | {{ selectedRoom.bedType }}</div>
-      </div>
+    <div v-show="selectedRoom" class="bottom-bar">
       <div class="bottom-price">
-        <span class="price-symbol">¥</span>
-        <span class="price-value">{{ selectedRoom.price }}</span>
-        <span class="price-unit">/晚</span>
+        <div class="selected-room-name">{{ selectedRoom.name }}</div>
+        <div class="selected-room-price">
+          <span class="price-symbol">¥</span>
+          <span class="price-value">{{ selectedRoom.price }}</span>
+          <span class="price-unit">/晚</span>
+        </div>
       </div>
-      <button class="bottom-book-btn" @click="bookHotel">立即预订</button>
+      <button class="bottom-book-btn" @click="bookSelectedRoom">立即预订</button>
     </div>
   </div>
 </template>
@@ -213,8 +212,8 @@ export default {
   name: 'HotelDetail',
   data () {
     return {
-      currentFilter: 'all',
       selectedRoom: null,
+      currentFilter: 'all',
       commentFilters: [
         { label: '全部', value: 'all' },
         { label: '好评', value: 'good' },
@@ -378,13 +377,19 @@ export default {
         this.selectedRoom = room
       }
     },
+    toggleRoomSelection (room) {
+      this.selectRoom(room)
+    },
     bookRoom (room) {
       this.selectedRoom = room
     },
-    bookHotel () {
+    bookSelectedRoom () {
       if (this.selectedRoom) {
-        alert(`正在预订 ${this.selectedRoom.name}，价格 ¥${this.selectedRoom.price}/晚`)
+        alert(`预订 ${this.selectedRoom.name}，价格 ¥${this.selectedRoom.price}/晚`)
       }
+    },
+    bookHotel () {
+      alert('正在跳转到预订页面...')
     }
   }
 }
@@ -396,7 +401,6 @@ export default {
 .hotel-detail-page
   min-height: 100vh
   background-color: #f5f5f5
-  padding-bottom: px2rem(120px)
 
   .header
     display: flex
@@ -627,7 +631,7 @@ export default {
       .room-item
         display: flex
         padding: px2rem(20px)
-        border: 1px solid #eee
+        border: 2px solid #eee
         border-radius: px2rem(10px)
         margin-bottom: px2rem(20px)
         cursor: pointer
@@ -635,7 +639,7 @@ export default {
 
         &.selected
           border-color: #ff6b00
-          background-color: rgba(255, 107, 0, 0.05)
+          background-color: rgba(255, 107, 0, 0.03)
 
         .room-image
           width: px2rem(200px)
@@ -643,23 +647,11 @@ export default {
           border-radius: px2rem(8px)
           overflow: hidden
           margin-right: px2rem(20px)
-          position: relative
 
           img
             width: 100%
             height: 100%
             object-fit: cover
-
-          .selected-badge
-            position: absolute
-            top: px2rem(10px)
-            right: px2rem(10px)
-            background-color: #ff6b00
-            color: #fff
-            padding: px2rem(8px) px2rem(16px)
-            border-radius: px2rem(20px)
-            font-size: px2rem(22px)
-            font-weight: bold
 
         .room-info
           flex: 1
@@ -671,6 +663,17 @@ export default {
             font-weight: bold
             color: #333
             margin-bottom: px2rem(8px)
+            display: flex
+            align-items: center
+
+            .selected-badge
+              font-size: px2rem(20px)
+              color: #ff6b00
+              background-color: rgba(255, 107, 0, 0.1)
+              padding: px2rem(4px) px2rem(12px)
+              border-radius: px2rem(4px)
+              margin-left: px2rem(15px)
+              font-weight: normal
 
           .room-size
             font-size: px2rem(24px)
@@ -722,7 +725,7 @@ export default {
               transition: all 0.3s
 
               &.selected
-                background-color: #06c1ae
+                background-color: #e55a00
 
   .comments-section
     background-color: #fff
@@ -911,32 +914,29 @@ export default {
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1)
     z-index: 100
 
-    .bottom-room-info
-      margin-right: px2rem(20px)
-
-      .bottom-room-name
-        font-size: px2rem(28px)
-        font-weight: bold
+    .bottom-price
+      .selected-room-name
+        font-size: px2rem(24px)
         color: #333
+        font-weight: bold
         margin-bottom: px2rem(5px)
 
-      .bottom-room-detail
-        font-size: px2rem(22px)
-        color: #999
+      .selected-room-price
+        display: flex
+        align-items: baseline
 
-    .bottom-price
-      .price-symbol
-        font-size: px2rem(24px)
-        color: #ff6b00
+        .price-symbol
+          font-size: px2rem(24px)
+          color: #ff6b00
 
-      .price-value
-        font-size: px2rem(44px)
-        font-weight: bold
-        color: #ff6b00
+        .price-value
+          font-size: px2rem(44px)
+          font-weight: bold
+          color: #ff6b00
 
-      .price-unit
-        font-size: px2rem(24px)
-        color: #666
+        .price-unit
+          font-size: px2rem(24px)
+          color: #666
 
     .bottom-book-btn
       padding: px2rem(20px) px2rem(60px)
@@ -947,5 +947,4 @@ export default {
       font-size: px2rem(30px)
       font-weight: bold
       cursor: pointer
-      margin-left: px2rem(20px)
 </style>
