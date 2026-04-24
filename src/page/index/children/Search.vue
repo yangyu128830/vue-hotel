@@ -183,11 +183,12 @@
   @import 'src/style/common'
   .search-page--box
     background: #fff;
-    border-top-left-radius: px2rem(6px);
-    border-top-right-radius: px2rem(6px);
-    @include size('margin',-110px 20px 0px 20px);
-    border: 1px solid #f3f3f3;
-    border-radius: px2rem(10px);
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    @include size('margin',0px 0px 0px 0px);
+    border: none;
+    border-radius: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     .search-header
       border-bottom: 1px solid #f3f3f3;
       display: flex;
