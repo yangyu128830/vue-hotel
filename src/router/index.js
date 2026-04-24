@@ -3,8 +3,18 @@ import Router from 'vue-router'
 import Index from '@/page/index/Index'
 import HotelList from '@/page/hotel-list/index'
 import HotelDetail from '@/page/hotel-detail/index'
+import Travel from '@/page/travel/index'
 
 Vue.use(Router)
+
+const PlaceholderPage = {
+  template: `
+    <div class="placeholder-page">
+      <div class="placeholder-icon">🏗️</div>
+      <div class="placeholder-text">该功能正在开发中...</div>
+    </div>
+  `
+}
 
 export default new Router({
   mode: 'history',
@@ -12,6 +22,11 @@ export default new Router({
     {
       path: '/',
       name: 'Index',
+      component: Index
+    },
+    {
+      path: '/hotel',
+      name: 'Hotel',
       component: Index
     },
     {
@@ -23,6 +38,26 @@ export default new Router({
       path: '/hotel-detail/:hotelId',
       name: 'HotelDetail',
       component: HotelDetail
+    },
+    {
+      path: '/travel',
+      name: 'Travel',
+      component: Travel
+    },
+    {
+      path: '/food',
+      name: 'Food',
+      component: PlaceholderPage
+    },
+    {
+      path: '/member',
+      name: 'Member',
+      component: PlaceholderPage
+    },
+    {
+      path: '/profile',
+      name: 'Profile',
+      component: PlaceholderPage
     }
   ]
 })
