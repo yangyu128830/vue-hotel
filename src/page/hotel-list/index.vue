@@ -86,6 +86,7 @@
         v-for="hotel in filteredHotels" 
         :key="hotel.id" 
         class="hotel-item"
+        @click="goToHotelDetail(hotel)"
       >
         <div class="hotel-image">
           <img :src="hotel.image" :alt="hotel.name" />
@@ -304,6 +305,21 @@ export default {
   methods: {
     goBack () {
       this.$router.go(-1)
+    },
+    goToHotelDetail (hotel) {
+      this.$router.push({
+        name: 'HotelDetail',
+        params: { hotelId: hotel.id },
+        query: {
+          hotelName: hotel.name,
+          hotelImage: hotel.image,
+          hotelScore: hotel.score,
+          hotelLocation: hotel.location,
+          hotelTags: hotel.tags.join(','),
+          hotelPrice: hotel.price,
+          hotelCommentCount: hotel.commentCount
+        }
+      })
     },
     toggleSearchBox () {
       this.showSearchBox = !this.showSearchBox
