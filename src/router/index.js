@@ -4,6 +4,7 @@ import Index from '@/page/index/Index'
 import HotelList from '@/page/hotel-list/index'
 import HotelDetail from '@/page/hotel-detail/index'
 import Travel from '@/page/travel/index'
+import AttractionDetail from '@/page/attraction-detail/index'
 
 Vue.use(Router)
 
@@ -43,6 +44,11 @@ export default new Router({
       path: '/travel',
       name: 'Travel',
       component: Travel
+    },
+    {
+      path: '/attraction-detail/:attractionId',
+      name: 'AttractionDetail',
+      component: AttractionDetail
     },
     {
       path: '/food',

@@ -21,7 +21,62 @@
             placeholder="搜索景点、门票、游玩项目" 
             class="search-input-inline"
             @input="searchAttractions"
+            @focus="showSearchSuggestion"
+            @keyup.enter="confirmSearch"
           />
+          <div class="search-clear-btn" v-show="searchKeyword" @click="clearSearch">✕</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="search-suggestion-overlay" v-show="showSuggestion" @click="hideSearchSuggestion">
+      <div class="search-suggestion" @click.stop>
+        <div class="search-suggestion-header">
+          <span class="suggestion-title">热门搜索</span>
+        </div>
+        <div class="hot-search-tags">
+          <span 
+            v-for="tag in hotSearchTags" 
+            :key="tag" 
+            class="hot-search-tag"
+            @click="searchByTag(tag)"
+          >
+            {{ tag }}
+          </span>
+        </div>
+        <div class="search-suggestion-header" v-show="searchHistory.length > 0">
+          <span class="suggestion-title">搜索历史</span>
+          <span class="clear-history" @click="clearHistory">清空</span>
+        </div>
+        <div class="search-history-list" v-show="searchHistory.length > 0">
+          <div 
+            v-for="(history, index) in searchHistory" 
+            :key="index" 
+            class="search-history-item"
+            @click="searchByHistory(history)"
+          >
+            <span class="history-icon">🕐</span>
+            <span class="history-text">{{ history }}</span>
+          </div>
+        </div>
+        <div class="search-suggestion-header" v-show="searchKeyword && searchSuggestions.length > 0">
+          <span class="suggestion-title">搜索建议</span>
+        </div>
+        <div class="search-suggestion-list" v-show="searchKeyword && searchSuggestions.length > 0">
+          <div 
+            v-for="(suggestion, index) in searchSuggestions" 
+            :key="index" 
+            class="search-suggestion-item"
+            @click="goToAttractionDetail(suggestion)"
+          >
+            <span class="suggestion-icon">📍</span>
+            <span class="suggestion-text">{{ suggestion.name }}</span>
+            <span class="suggestion-location">{{ suggestion.location }}</span>
+          </div>
+        </div>
+        <div class="no-search-result" v-show="searchKeyword && searchSuggestions.length === 0">
+          <div class="no-result-icon">🔍</div>
+          <div class="no-result-text">未找到相关景点</div>
         </div>
       </div>
     </div>
@@ -256,7 +311,10 @@ export default {
       currentCity: '北京',
       currentDistrict: '朝阳区',
       showCityDropdown: false,
+      showSuggestion: false,
       searchKeyword: '',
+      searchHistory: [],
+      hotSearchTags: ['故宫', '长城', '颐和园', '天坛', '圆明园', '798', '南锣鼓巷'],
       showDistanceDropdown: false,
       showTimeDropdown: false,
       selectedDistance: '',
@@ -531,6 +589,17 @@ export default {
       }
 
       return result
+    },
+    searchSuggestions () {
+      if (!this.searchKeyword) {
+        return []
+      }
+      const keyword = this.searchKeyword.toLowerCase()
+      return this.recommendations.filter(item =>
+        item.name.toLowerCase().includes(keyword) ||
+        item.location.toLowerCase().includes(keyword) ||
+        item.tags.some(tag => tag.toLowerCase().includes(keyword))
+      ).slice(0, 10)
     }
   },
   methods: {
@@ -548,8 +617,41 @@ export default {
       this.closeCityDropdown()
       console.log('选择城市:', city.name)
     },
+    showSearchSuggestion () {
+      this.showSuggestion = true
+    },
+    hideSearchSuggestion () {
+      this.showSuggestion = false
+    },
+    clearSearch () {
+      this.searchKeyword = ''
+    },
     searchAttractions () {
       console.log('搜索景点:', this.searchKeyword)
+    },
+    confirmSearch () {
+      if (this.searchKeyword.trim()) {
+        this.addToHistory(this.searchKeyword.trim())
+        this.hideSearchSuggestion()
+      }
+    },
+    searchByTag (tag) {
+      this.searchKeyword = tag
+      this.addToHistory(tag)
+      this.hideSearchSuggestion()
+    },
+    searchByHistory (history) {
+      this.searchKeyword = history
+      this.hideSearchSuggestion()
+    },
+    addToHistory (keyword) {
+      if (!keyword) return
+      const history = this.searchHistory.filter(h => h !== keyword)
+      history.unshift(keyword)
+      this.searchHistory = history.slice(0, 10)
+    },
+    clearHistory () {
+      this.searchHistory = []
     },
     toggleDistanceDropdown () {
       this.showDistanceDropdown = !this.showDistanceDropdown
@@ -587,8 +689,79 @@ export default {
     viewMoreRanking () {
       console.log('查看更多榜单')
     },
+    getAttractionData (attraction) {
+      const attractionData = {
+        id: attraction.id,
+        name: attraction.name,
+        image: attraction.image,
+        score: attraction.score,
+        location: attraction.location,
+        distance: attraction.distanceValue || 5,
+        tags: attraction.tags || [],
+        price: attraction.price,
+        commentCount: attraction.commentCount || 0,
+        description: ''
+      }
+
+      if (attraction.id === 101 || attraction.id === 201 || attraction.id === 301) {
+        attractionData.description = '故宫博物院是中国明清两代的皇家宫殿，旧称紫禁城，位于北京中轴线的中心。故宫以三大殿为中心，占地面积约72万平方米，建筑面积约15万平方米，有大小宫殿七十多座，房屋九千余间。'
+        attractionData.tags = ['历史古迹', '必游推荐', '世界遗产']
+      } else if (attraction.id === 102 || attraction.id === 202 || attraction.id === 303) {
+        attractionData.description = '八达岭长城，是明长城中保存最好的一段，也是最具代表性的一段。它建于1504年，是明代长城的精华地段，海拔高达1015米，城墙高7.8米，顶宽5米，底宽6.5米。'
+        attractionData.tags = ['世界遗产', '自然风光', '登山徒步']
+      } else if (attraction.id === 103 || attraction.id === 203 || attraction.id === 305) {
+        attractionData.description = '颐和园，中国清朝时期皇家园林，前身为清漪园，坐落在北京西郊，距城区15公里，全园占地3.009平方公里，水面约占四分之三。'
+        attractionData.tags = ['皇家园林', '历史文化', '休闲漫步']
+      } else if (attraction.id === 104 || attraction.id === 204 || attraction.id === 307) {
+        attractionData.description = '天坛公园在北京市南部，东城区永定门内大街东侧。占地约273万平方米。天坛始建于明永乐十八年，清乾隆、光绪时曾重修改建。'
+        attractionData.tags = ['历史古迹', '祭祀文化', '公园散步']
+      } else if (attraction.id === 302) {
+        attractionData.description = '南锣鼓巷是一条胡同，位于北京中轴线东侧的交道口地区，北起鼓楼东大街，南至平安大街，宽8米，全长787米，与元大都同期建成。'
+        attractionData.tags = ['胡同文化', '特色街区', '美食小吃']
+      } else if (attraction.id === 304) {
+        attractionData.description = '798艺术区位于北京朝阳区酒仙桥街道大山子地区，故又称大山子艺术区，原为原国营798厂等电子工业的老厂区所在地。'
+        attractionData.tags = ['艺术创意', '拍照打卡', '文艺范']
+      } else if (attraction.id === 306) {
+        attractionData.description = '后海是什刹海的一个组成部分，由前海、后海、西海三块水面组成的什刹海，为了与北海、中海、南海"前三海"区别，被称作"后三海"。'
+        attractionData.tags = ['湖泊风光', '酒吧街', '胡同游']
+      } else if (attraction.id === 205 || attraction.id === 308) {
+        attractionData.description = '圆明园遗址公园位于北京市海淀区中部偏东，西北去西直门三公里，其东南角为清华大学西门。圆明园遗址公园为著名的爱国主义教育基地。'
+        attractionData.tags = ['历史遗址', '爱国主义', '园林景观']
+      } else if (attraction.id === 206) {
+        attractionData.description = '南锣鼓巷是北京最古老的街区之一，有着740多年的历史，保存着元大都时期的胡同风貌，是北京历史文化保护街区。'
+        attractionData.tags = ['胡同文化', '特色街区', '美食小吃']
+      } else if (attraction.id === 207) {
+        attractionData.description = '798艺术区汇集了众多的画廊、艺术家工作室、设计公司、餐饮酒吧等各种空间，形成了具有国际化色彩的"SOHO式艺术聚落"和"LOFT生活方式"。'
+        attractionData.tags = ['艺术创意', '拍照打卡', '文艺范']
+      } else if (attraction.id === 208) {
+        attractionData.description = '恭王府位于北京市西城区柳荫街，是全国重点文物保护单位，国家一级博物馆，国家AAAAA级旅游景区，为清代规模最大的一座王府。'
+        attractionData.tags = ['历史建筑', '王府文化', '园林景观']
+      } else if (attraction.id === 209) {
+        attractionData.description = '后海是指前海、后海、西海三块水面的什刹海，为了与北海、中海、南海"前三海"区别，被称作"后三海"。'
+        attractionData.tags = ['湖泊风光', '酒吧街', '胡同游']
+      } else {
+        attractionData.description = attraction.name + '是一处风景优美的旅游景点，拥有丰富的历史文化底蕴和独特的自然风光。景区内设施完善，服务周到，是休闲度假的绝佳选择。'
+      }
+
+      return attractionData
+    },
     goToAttractionDetail (attraction) {
-      console.log('前往景点详情:', attraction.name)
+      const data = this.getAttractionData(attraction)
+      this.$router.push({
+        name: 'AttractionDetail',
+        params: { attractionId: data.id },
+        query: {
+          name: data.name,
+          image: data.image,
+          score: data.score,
+          location: data.location,
+          distance: data.distance,
+          tags: data.tags.join(','),
+          price: data.price,
+          commentCount: data.commentCount,
+          description: data.description
+        }
+      })
     }
   }
 }
@@ -682,6 +855,135 @@ export default {
         outline: none
 
         &::placeholder
+          color: #999
+
+      .search-clear-btn
+        font-size: px2rem(28px)
+        color: #999
+        cursor: pointer
+        padding: px2rem(10px)
+
+  .search-suggestion-overlay
+    position: fixed
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+    background-color: rgba(0, 0, 0, 0.3)
+    z-index: 999
+
+    .search-suggestion
+      position: fixed
+      top: px2rem(0)
+      left: 0
+      right: 0
+      max-height: 70vh
+      background-color: #fff
+      overflow-y: auto
+      padding: px2rem(20px)
+      padding-top: px2rem(160px)
+
+      .search-suggestion-header
+        display: flex
+        justify-content: space-between
+        align-items: center
+        margin-bottom: px2rem(15px)
+        margin-top: px2rem(20px)
+
+        &:first-child
+          margin-top: 0
+
+        .suggestion-title
+          font-size: px2rem(28px)
+          font-weight: bold
+          color: #333
+
+        .clear-history
+          font-size: px2rem(24px)
+          color: #999
+          cursor: pointer
+
+      .hot-search-tags
+        display: flex
+        flex-wrap: wrap
+        gap: px2rem(15px)
+        margin-bottom: px2rem(10px)
+
+        .hot-search-tag
+          padding: px2rem(12px) px2rem(25px)
+          background-color: #f8f8f8
+          border-radius: px2rem(30px)
+          font-size: px2rem(26px)
+          color: #666
+          cursor: pointer
+          transition: all 0.2s
+
+          &:hover
+            background-color: #f0f9f8
+            color: #06c1ae
+
+      .search-history-list
+        margin-bottom: px2rem(10px)
+
+        .search-history-item
+          display: flex
+          align-items: center
+          padding: px2rem(20px) 0
+          border-bottom: 1px solid #f5f5f5
+          cursor: pointer
+
+          &:last-child
+            border-bottom: none
+
+          .history-icon
+            font-size: px2rem(28px)
+            margin-right: px2rem(15px)
+            color: #999
+
+          .history-text
+            font-size: px2rem(28px)
+            color: #333
+
+      .search-suggestion-list
+        margin-bottom: px2rem(10px)
+
+        .search-suggestion-item
+          display: flex
+          align-items: center
+          padding: px2rem(20px) 0
+          border-bottom: 1px solid #f5f5f5
+          cursor: pointer
+
+          &:last-child
+            border-bottom: none
+
+          .suggestion-icon
+            font-size: px2rem(28px)
+            margin-right: px2rem(15px)
+            color: #999
+
+          .suggestion-text
+            font-size: px2rem(28px)
+            color: #333
+            flex: 1
+
+          .suggestion-location
+            font-size: px2rem(24px)
+            color: #999
+
+      .no-search-result
+        display: flex
+        flex-direction: column
+        align-items: center
+        justify-content: center
+        padding: px2rem(60px) 0
+
+        .no-result-icon
+          font-size: px2rem(80px)
+          margin-bottom: px2rem(15px)
+
+        .no-result-text
+          font-size: px2rem(28px)
           color: #999
 
   .city-dropdown-overlay
