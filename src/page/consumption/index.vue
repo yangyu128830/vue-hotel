@@ -1,5 +1,11 @@
 <template>
   <div class="consumption-page">
+    <div class="page-header">
+      <div class="back-btn" @click="goBack">
+        <span>←</span>
+      </div>
+      <div class="page-title">消费记录</div>
+    </div>
     <div class="summary-card">
       <div class="summary-header">
         <span class="summary-title">本月消费</span>
@@ -551,6 +557,9 @@ export default {
       setTimeout(() => {
         this.selectedRecord = null
       }, 300)
+    },
+    goBack () {
+      this.$router.go(-1)
     }
   }
 }
@@ -563,6 +572,30 @@ export default {
   min-height: 100vh
   background-color: #f5f5f5
   padding-bottom: px2rem(40px)
+
+.page-header
+  display: flex
+  align-items: center
+  background-color: #fff
+  padding: px2rem(20px)
+  border-bottom: 1px solid #eee
+
+.back-btn
+  width: px2rem(80px)
+  height: px2rem(80px)
+  display: flex
+  align-items: center
+  justify-content: center
+  font-size: px2rem(40px)
+  color: #333
+  cursor: pointer
+  margin-right: px2rem(20px)
+  flex-shrink: 0
+
+.page-title
+  font-size: px2rem(32px)
+  font-weight: bold
+  color: #333
 
 .summary-card
   background: linear-gradient(135deg, #06c1ae, #0a9d8c)

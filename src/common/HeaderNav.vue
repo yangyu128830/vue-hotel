@@ -51,6 +51,7 @@ export default {
 
   .nav-container
     display: flex
+    justify-content: center
     padding: 0 px2rem(20px)
     overflow-x: auto
     scrollbar-width: none
