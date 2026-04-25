@@ -129,53 +129,80 @@
         <div 
           v-for="pkg in filteredPackages" 
           :key="pkg.id" 
-          class="package-item"
-          :class="{ selected: selectedPackage && selectedPackage.id === pkg.id }"
+          class="package-card"
+          :class="[
+            getPackageClass(pkg),
+            { selected: selectedPackage && selectedPackage.id === pkg.id }
+          ]"
           @click="selectPackage(pkg)"
         >
-          <div class="package-header">
-            <div class="package-name">{{ pkg.name }}</div>
-            <div class="package-badges">
-              <span v-for="badge in pkg.badges" :key="badge" class="package-badge">{{ badge }}</span>
+          <div class="package-image-wrapper">
+            <img :src="pkg.image" :alt="pkg.name" class="package-image" />
+            <div class="save-badge">
+              <span class="save-label">省</span>
+              <span class="save-amount">¥{{ getSaveAmount(pkg) }}</span>
+            </div>
+            <div class="discount-badge" v-if="pkg.discount">
+              <span class="discount-text">{{ pkg.discount }}折</span>
             </div>
           </div>
-          <div class="package-desc">{{ pkg.description }}</div>
-          <div class="package-includes">
-            <span class="includes-label">套餐包含：</span>
-            <span v-for="item in pkg.includes" :key="item" class="include-item">{{ item }}</span>
-          </div>
-          <div class="package-restrictions" v-if="pkg.restrictions">
-            <div class="restriction-item" v-if="pkg.restrictions.noWeekend">
-              <span class="restriction-icon">⚠️</span>
-              <span class="restriction-text">使用限制：周六、周日不可使用</span>
+          <div class="package-content">
+            <div class="package-top">
+              <div class="package-name-row">
+                <span class="package-name">{{ pkg.name }}</span>
+                <div class="package-badges">
+                  <span v-for="badge in pkg.badges" :key="badge" class="package-badge" :class="getBadgeClass(badge)">{{ badge }}</span>
+                </div>
+              </div>
+              <div class="package-desc">{{ pkg.description }}</div>
             </div>
-            <div class="restriction-item" v-if="pkg.restrictions.studentOnly">
-              <span class="restriction-icon">🎓</span>
-              <span class="restriction-text">学生特惠：需出示有效学生证</span>
+            <div class="package-middle">
+              <div class="package-includes">
+                <span class="includes-icon">🍽️</span>
+                <span class="includes-text">
+                  <span v-for="(item, index) in pkg.includes.slice(0, 4)" :key="index">
+                    {{ item }}<span v-if="index < Math.min(pkg.includes.length - 1, 3)">、</span>
+                  </span>
+                  <span v-if="pkg.includes.length > 4">等{{ pkg.includes.length }}种</span>
+                </span>
+              </div>
+              <div class="package-restrictions-mini" v-if="pkg.restrictions">
+                <span class="restriction-item" v-if="pkg.restrictions.noWeekend">
+                  <span class="restriction-icon">⚠️</span>
+                  周六周日不可用
+                </span>
+                <span class="restriction-item" v-if="pkg.restrictions.studentOnly">
+                  <span class="restriction-icon">🎓</span>
+                  需学生证
+                </span>
+                <span class="restriction-item" v-if="pkg.restrictions.minHours">
+                  <span class="restriction-icon">⏰</span>
+                  {{ pkg.restrictions.minHours }}
+                </span>
+              </div>
             </div>
-            <div class="restriction-item" v-if="pkg.restrictions.minHours">
-              <span class="restriction-icon">⏰</span>
-              <span class="restriction-text">使用时间：{{ pkg.restrictions.minHours }}</span>
+            <div class="package-bottom">
+              <div class="package-price-info">
+                <div class="price-row">
+                  <span class="original-price" v-if="pkg.originalPrice">¥{{ pkg.originalPrice }}</span>
+                  <span class="current-price">
+                    <span class="price-symbol">¥</span>
+                    <span class="price-value">{{ pkg.price }}</span>
+                  </span>
+                </div>
+                <div class="sales-info" v-if="pkg.soldCount">
+                  <span class="hot-icon">🔥</span>
+                  <span class="sales-text">已售{{ pkg.soldCount }}+</span>
+                </div>
+              </div>
+              <button 
+                class="buy-button" 
+                :class="{ selected: selectedPackage && selectedPackage.id === pkg.id }"
+                @click.stop="togglePackageSelection(pkg)"
+              >
+                <span class="button-text">{{ selectedPackage && selectedPackage.id === pkg.id ? '已选择' : '立即抢购' }}</span>
+              </button>
             </div>
-            <div class="restriction-item" v-if="pkg.restrictions.quantityLimit">
-              <span class="restriction-icon">🎫</span>
-              <span class="restriction-text">购买限制：{{ pkg.restrictions.quantityLimit }}</span>
-            </div>
-          </div>
-          <div class="package-price-section">
-            <div class="package-price">
-              <span class="original-price" v-if="pkg.originalPrice">¥{{ pkg.originalPrice }}</span>
-              <span class="price-symbol">¥</span>
-              <span class="price-value">{{ pkg.price }}</span>
-            </div>
-            <div class="package-sold" v-if="pkg.soldCount">已售{{ pkg.soldCount }}+</div>
-            <button 
-              class="buy-btn" 
-              :class="{ selected: selectedPackage && selectedPackage.id === pkg.id }"
-              @click.stop="togglePackageSelection(pkg)"
-            >
-              {{ selectedPackage && selectedPackage.id === pkg.id ? '已选择' : '抢购' }}
-            </button>
           </div>
         </div>
       </div>
@@ -319,8 +346,11 @@ export default {
           includes: ['招牌鸳鸯锅', '精品牛肉卷', '精选羊肉卷', '时令蔬菜拼盘', '手打虾滑', '特色小吃x2', '酸梅汤x2'],
           price: 168,
           originalPrice: 268,
+          discount: 6.3,
           soldCount: 5678,
-          restrictions: null
+          restrictions: null,
+          packageType: 'hot',
+          image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=delicious%20hotpot%20double%20set%20meal%20with%20beef%20lamb%20vegetables%20soup%20base&image_size=square'
         },
         {
           id: 2,
@@ -330,11 +360,14 @@ export default {
           includes: ['单人锅底', '精品肥牛', '蔬菜拼盘', '手打面条', '酸梅汤'],
           price: 58,
           originalPrice: 98,
+          discount: 5.9,
           soldCount: 3456,
           restrictions: {
             noWeekend: true,
             minHours: '周一至周五 11:00-14:00'
-          }
+          },
+          packageType: 'weekday',
+          image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=lunch%20special%20hotpot%20set%20for%20one%20person%20with%20beef%20vegetables%20noodles&image_size=square'
         },
         {
           id: 3,
@@ -344,11 +377,14 @@ export default {
           includes: ['招牌骨汤锅', '精品牛肉卷', '精选羊肉卷', '鱼豆腐', '蔬菜拼盘', '金针菇', '酸梅汤x2'],
           price: 128,
           originalPrice: 218,
+          discount: 5.9,
           soldCount: 2345,
           restrictions: {
             studentOnly: true,
             quantityLimit: '每人限购2份'
-          }
+          },
+          packageType: 'student',
+          image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=student%20discount%20hotpot%20meal%20for%20two%20people%20affordable%20and%20delicious&image_size=square'
         },
         {
           id: 4,
@@ -358,8 +394,11 @@ export default {
           includes: ['招牌鸳鸯锅', '精品牛肉卷x2', '精选羊肉卷x2', '手打虾滑', '毛肚', '黄喉', '鸭肠', '蔬菜大拼盘', '特色小吃x4', '酸梅汤x4'],
           price: 298,
           originalPrice: 458,
+          discount: 6.5,
           soldCount: 1890,
-          restrictions: null
+          restrictions: null,
+          packageType: 'family',
+          image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=family%20gathering%20hotpot%20feast%20large%20portion%20various%20ingredients%20delicious&image_size=square'
         },
         {
           id: 5,
@@ -369,10 +408,13 @@ export default {
           includes: ['单人锅底', '精品肥牛', '精选羊肉', '蔬菜拼盘', '特色小吃', '酸梅汤'],
           price: 88,
           originalPrice: 138,
+          discount: 6.4,
           soldCount: 1234,
           restrictions: {
             minHours: '每日 20:00-22:00'
-          }
+          },
+          packageType: 'night',
+          image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=late%20night%20hotpot%20special%20snack%20dinner%20cozy%20atmosphere%20beef%20vegetables&image_size=square'
         }
       ],
       recommendDishes: [
@@ -596,6 +638,30 @@ export default {
         const totalPrice = this.selectedPackage.price * this.packageQuantity
         alert(`购买 ${this.selectedPackage.name} × ${this.packageQuantity} 份\n总价：¥${totalPrice}`)
       }
+    },
+    getSaveAmount (pkg) {
+      if (pkg.originalPrice && pkg.price) {
+        return pkg.originalPrice - pkg.price
+      }
+      return 0
+    },
+    getPackageClass (pkg) {
+      const typeClassMap = {
+        hot: 'package-hot',
+        student: 'package-student',
+        weekday: 'package-weekday',
+        family: 'package-family',
+        night: 'package-night'
+      }
+      return typeClassMap[pkg.packageType] || ''
+    },
+    getBadgeClass (badge) {
+      if (badge.includes('学生')) return 'badge-student'
+      if (badge.includes('热销')) return 'badge-hot'
+      if (badge.includes('特惠') || badge.includes('特价')) return 'badge-discount'
+      if (badge.includes('工作日')) return 'badge-weekday'
+      if (badge.includes('深夜')) return 'badge-night'
+      return 'badge-default'
     }
   }
 }
@@ -956,133 +1022,270 @@ export default {
       flex-direction: column
       gap: px2rem(20px)
 
-    .package-item
-      padding: px2rem(20px)
-      border: 2px solid #eee
-      border-radius: px2rem(12px)
+    .package-card
+      display: flex
+      background-color: #fff
+      border-radius: px2rem(16px)
+      overflow: hidden
       cursor: pointer
-      transition: all 0.3s
+      transition: all 0.3s ease
+      border: 2px solid #f0f0f0
+      position: relative
+
+      &:hover
+        box-shadow: 0 px2rem(8px) px2rem(24px) rgba(0, 0, 0, 0.08)
+        transform: translateY(-px2rem(2px))
 
       &.selected
         border-color: #ff6b00
-        background-color: rgba(255, 107, 0, 0.03)
+        box-shadow: 0 px2rem(4px) px2rem(16px) rgba(255, 107, 0, 0.15)
 
-      .package-header
+      &.package-hot
+        background: linear-gradient(135deg, #fff5f5 0%, #fff 50%)
+        border-color: #ffe0e0
+
+      &.package-student
+        background: linear-gradient(135deg, #f0f9ff 0%, #fff 50%)
+        border-color: #d0e8ff
+
+      &.package-weekday
+        background: linear-gradient(135deg, #f0fff4 0%, #fff 50%)
+        border-color: #d4edda
+
+      &.package-family
+        background: linear-gradient(135deg, #fffbeb 0%, #fff 50%)
+        border-color: #fef3c7
+
+      &.package-night
+        background: linear-gradient(135deg, #faf5ff 0%, #fff 50%)
+        border-color: #e9d5ff
+
+      .package-image-wrapper
+        position: relative
+        width: px2rem(240px)
+        flex-shrink: 0
+        overflow: hidden
+
+        .package-image
+          width: 100%
+          height: 100%
+          object-fit: cover
+          transition: transform 0.3s ease
+
+      .package-card:hover .package-image-wrapper .package-image
+        transform: scale(1.05)
+
+      .save-badge
+        position: absolute
+        top: px2rem(12px)
+        left: px2rem(12px)
+        background: linear-gradient(135deg, #ff6b00 0%, #ff8c33 100%)
+        border-radius: px2rem(4px)
+        padding: px2rem(6px) px2rem(12px)
         display: flex
-        justify-content: space-between
-        align-items: flex-start
-        margin-bottom: px2rem(10px)
-        flex-wrap: wrap
-
-        .package-name
-          font-size: px2rem(30px)
-          font-weight: bold
-          color: #333
-          margin-bottom: px2rem(8px)
-
-        .package-badges
-          display: flex
-          gap: px2rem(8px)
-          flex-wrap: wrap
-
-          .package-badge
-            font-size: px2rem(20px)
-            color: #ff6b00
-            background-color: rgba(255, 107, 0, 0.1)
-            padding: px2rem(4px) px2rem(12px)
-            border-radius: px2rem(4px)
-
-      .package-desc
-        font-size: px2rem(24px)
-        color: #666
-        margin-bottom: px2rem(12px)
-
-      .package-includes
-        font-size: px2rem(24px)
-        color: #666
-        margin-bottom: px2rem(15px)
-        display: flex
-        flex-wrap: wrap
-
-        .includes-label
-          color: #999
-
-        .include-item
-          color: #06c1ae
-          margin-right: px2rem(8px)
-
-          &:after
-            content: '、'
-            color: #666
-
-          &:last-child:after
-            content: ''
-
-      .package-restrictions
-        background-color: #fff8f0
-        border-radius: px2rem(8px)
-        padding: px2rem(15px)
-        margin-bottom: px2rem(15px)
-
-        .restriction-item
-          display: flex
-          align-items: center
-          margin-bottom: px2rem(10px)
-          font-size: px2rem(22px)
-
-          &:last-child
-            margin-bottom: 0
-
-          .restriction-icon
-            margin-right: px2rem(8px)
-
-          .restriction-text
-            color: #ff6b00
-
-      .package-price-section
-        display: flex
-        justify-content: space-between
+        flex-direction: column
         align-items: center
+        box-shadow: 0 px2rem(2px) px2rem(8px) rgba(255, 107, 0, 0.3)
 
-        .package-price
-          display: flex
-          align-items: baseline
+        .save-label
+          font-size: px2rem(18px)
+          color: rgba(255, 255, 255, 0.9)
+          line-height: 1
 
-          .original-price
-            font-size: px2rem(24px)
-            color: #999
-            text-decoration: line-through
-            margin-right: px2rem(10px)
-
-          .price-symbol
-            font-size: px2rem(24px)
-            color: #ff6b00
-
-          .price-value
-            font-size: px2rem(44px)
-            font-weight: bold
-            color: #ff6b00
-
-        .package-sold
-          font-size: px2rem(22px)
-          color: #ff6b00
-          margin-top: px2rem(5px)
-          flex: 1
-          margin-left: px2rem(15px)
-
-        .buy-btn
-          padding: px2rem(12px) px2rem(30px)
-          background-color: #ff6b00
-          color: #fff
-          border: none
-          border-radius: px2rem(6px)
-          font-size: px2rem(26px)
+        .save-amount
+          font-size: px2rem(28px)
           font-weight: bold
-          cursor: pointer
-          transition: all 0.3s
+          color: #fff
+          line-height: 1
+          margin-top: px2rem(2px)
 
-          &.selected
-            background-color: #e55a00
+      .discount-badge
+        position: absolute
+        top: px2rem(12px)
+        right: px2rem(12px)
+        background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%)
+        border-radius: px2rem(4px)
+        padding: px2rem(6px) px2rem(12px)
+        box-shadow: 0 px2rem(2px) px2rem(8px) rgba(255, 71, 87, 0.3)
+
+        .discount-text
+          font-size: px2rem(24px)
+          font-weight: bold
+          color: #fff
+
+      .package-content
+        flex: 1
+        display: flex
+        flex-direction: column
+        padding: px2rem(20px)
+        min-width: 0
+
+        .package-top
+          margin-bottom: px2rem(12px)
+
+          .package-name-row
+            display: flex
+            align-items: center
+            margin-bottom: px2rem(8px)
+            flex-wrap: wrap
+            gap: px2rem(8px)
+
+            .package-name
+              font-size: px2rem(30px)
+              font-weight: bold
+              color: #333
+              margin-right: px2rem(10px)
+
+            .package-badges
+              display: flex
+              gap: px2rem(8px)
+              flex-wrap: wrap
+
+              .package-badge
+                font-size: px2rem(20px)
+                padding: px2rem(4px) px2rem(12px)
+                border-radius: px2rem(4px)
+                font-weight: 500
+
+                &.badge-hot
+                  color: #ff4757
+                  background-color: rgba(255, 71, 87, 0.1)
+
+                &.badge-student
+                  color: #1890ff
+                  background-color: rgba(24, 144, 255, 0.1)
+
+                &.badge-discount
+                  color: #ff6b00
+                  background-color: rgba(255, 107, 0, 0.1)
+
+                &.badge-weekday
+                  color: #52c41a
+                  background-color: rgba(82, 196, 26, 0.1)
+
+                &.badge-night
+                  color: #722ed1
+                  background-color: rgba(114, 46, 209, 0.1)
+
+                &.badge-default
+                  color: #666
+                  background-color: #f5f5f5
+
+          .package-desc
+            font-size: px2rem(24px)
+            color: #666
+            line-height: 1.5
+            overflow: hidden
+            text-overflow: ellipsis
+            display: -webkit-box
+            -webkit-line-clamp: 2
+            -webkit-box-orient: vertical
+
+        .package-middle
+          margin-bottom: px2rem(12px)
+
+          .package-includes
+            display: flex
+            align-items: flex-start
+            font-size: px2rem(22px)
+            color: #666
+            margin-bottom: px2rem(8px)
+            flex-wrap: wrap
+
+            .includes-icon
+              margin-right: px2rem(6px)
+              font-size: px2rem(24px)
+
+            .includes-text
+              overflow: hidden
+              text-overflow: ellipsis
+              white-space: nowrap
+
+          .package-restrictions-mini
+            display: flex
+            flex-wrap: wrap
+            gap: px2rem(12px)
+            font-size: px2rem(20px)
+            color: #999
+
+            .restriction-item
+              display: flex
+              align-items: center
+              padding: px2rem(4px) px2rem(8px)
+              background-color: rgba(0, 0, 0, 0.02)
+              border-radius: px2rem(4px)
+
+              .restriction-icon
+                margin-right: px2rem(4px)
+
+        .package-bottom
+          display: flex
+          justify-content: space-between
+          align-items: flex-end
+          margin-top: auto
+
+          .package-price-info
+            display: flex
+            flex-direction: column
+
+            .price-row
+              display: flex
+              align-items: baseline
+              margin-bottom: px2rem(4px)
+
+              .original-price
+                font-size: px2rem(24px)
+                color: #999
+                text-decoration: line-through
+                margin-right: px2rem(10px)
+
+              .current-price
+                display: flex
+                align-items: baseline
+
+                .price-symbol
+                  font-size: px2rem(24px)
+                  color: #ff6b00
+                  font-weight: bold
+
+                .price-value
+                  font-size: px2rem(44px)
+                  font-weight: bold
+                  color: #ff6b00
+                  line-height: 1
+
+            .sales-info
+              display: flex
+              align-items: center
+              font-size: px2rem(20px)
+              color: #ff6b00
+
+              .hot-icon
+                margin-right: px2rem(4px)
+
+          .buy-button
+            padding: px2rem(16px) px2rem(36px)
+            background: linear-gradient(135deg, #ff6b00 0%, #ff8c33 100%)
+            color: #fff
+            border: none
+            border-radius: px2rem(8px)
+            font-size: px2rem(26px)
+            font-weight: bold
+            cursor: pointer
+            transition: all 0.3s ease
+            box-shadow: 0 px2rem(4px) px2rem(12px) rgba(255, 107, 0, 0.3)
+
+            &:hover
+              background: linear-gradient(135deg, #e55a00 0%, #ff7a1a 100%)
+              box-shadow: 0 px2rem(6px) px2rem(16px) rgba(255, 107, 0, 0.4)
+
+            &.selected
+              background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%)
+              box-shadow: 0 px2rem(4px) px2rem(12px) rgba(82, 196, 26, 0.3)
+
+            .button-text
+              position: relative
+              z-index: 1
 
     .no-packages
       text-align: center
