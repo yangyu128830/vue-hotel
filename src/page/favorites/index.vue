@@ -1,6 +1,9 @@
 <template>
   <div class="favorites-page">
     <div class="search-header">
+      <div class="back-btn" @click="goBack">
+        <span>←</span>
+      </div>
       <div class="search-section">
         <div class="search-icon-inline">🔍</div>
         <input 
@@ -298,6 +301,9 @@ export default {
       setTimeout(() => {
         this.showToastVisible = false
       }, 2000)
+    },
+    goBack () {
+      this.$router.go(-1)
     }
   }
 }
@@ -312,11 +318,26 @@ export default {
   padding-bottom: px2rem(40px)
 
 .search-header
+  display: flex
+  align-items: center
   background-color: #fff
   padding: px2rem(20px)
   border-bottom: 1px solid #eee
 
+.back-btn
+  width: px2rem(80px)
+  height: px2rem(80px)
+  display: flex
+  align-items: center
+  justify-content: center
+  font-size: px2rem(40px)
+  color: #333
+  cursor: pointer
+  margin-right: px2rem(20px)
+  flex-shrink: 0
+
 .search-section
+  flex: 1
   display: flex
   align-items: center
   background-color: #f5f5f5
