@@ -100,12 +100,12 @@
       <div class="action-sheet" @click.stop>
         <div class="action-sheet-title">消息操作</div>
         <div class="action-sheet-item" @click="toggleImportant">
-          <span class="action-icon">{{ currentNotification?.isImportant ? '☆' : '★' }}</span>
-          <span class="action-text">{{ currentNotification?.isImportant ? '取消重点' : '标记为重点' }}</span>
+          <span class="action-icon">{{ isCurrentNotificationImportant ? '☆' : '★' }}</span>
+          <span class="action-text">{{ isCurrentNotificationImportant ? '取消重点' : '标记为重点' }}</span>
         </div>
         <div class="action-sheet-item" @click="markAsRead">
           <span class="action-icon">✓</span>
-          <span class="action-text">{{ currentNotification?.isRead ? '标记为未读' : '标记为已读' }}</span>
+          <span class="action-text">{{ isCurrentNotificationRead ? '标记为未读' : '标记为已读' }}</span>
         </div>
         <div class="action-sheet-item delete" @click="deleteNotification">
           <span class="action-icon">🗑️</span>
@@ -268,6 +268,12 @@ export default {
       })
 
       return result
+    },
+    isCurrentNotificationImportant () {
+      return this.currentNotification && this.currentNotification.isImportant
+    },
+    isCurrentNotificationRead () {
+      return this.currentNotification && this.currentNotification.isRead
     }
   },
   methods: {
