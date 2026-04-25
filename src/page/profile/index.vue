@@ -140,7 +140,7 @@
           <span class="settings-arrow">›</span>
         </div>
         
-        <div class="settings-item" @click="showToast('📞', '联系客服功能开发中...')">
+        <div class="settings-item" @click="goToCustomerService">
           <span class="settings-icon">📞</span>
           <span class="settings-label">联系客服</span>
           <span class="settings-arrow">›</span>
@@ -305,6 +305,9 @@ export default {
     },
     goToNotifications () {
       this.$router.push('/notifications')
+    },
+    goToCustomerService () {
+      this.$router.push('/customer-service')
     }
   }
 }
