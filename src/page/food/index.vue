@@ -204,28 +204,28 @@
             <div class="modal-coupon-left">
               <div class="modal-coupon-value">
                 <span class="modal-coupon-symbol">¥</span>
-                <span class="modal-coupon-amount">{{ selectedCouponForDetail?.value }}</span>
+                <span class="modal-coupon-amount">{{ selectedCouponForDetail ? selectedCouponForDetail.value : 0 }}</span>
               </div>
-              <div class="modal-coupon-condition">满{{ selectedCouponForDetail?.minAmount }}可用</div>
+              <div class="modal-coupon-condition">满{{ selectedCouponForDetail ? selectedCouponForDetail.minAmount : 0 }}可用</div>
             </div>
             <div class="modal-coupon-divider"></div>
             <div class="modal-coupon-right">
-              <div class="modal-coupon-name">{{ selectedCouponForDetail?.name }}</div>
-              <div class="modal-coupon-validity">{{ selectedCouponForDetail?.validity }}</div>
+              <div class="modal-coupon-name">{{ selectedCouponForDetail ? selectedCouponForDetail.name : '' }}</div>
+              <div class="modal-coupon-validity">{{ selectedCouponForDetail ? selectedCouponForDetail.validity : '' }}</div>
             </div>
           </div>
           <div class="modal-coupon-restaurant">
             <span class="restaurant-label">适用商家：</span>
-            <span class="restaurant-name">{{ selectedRestaurantForCoupon?.name }}</span>
+            <span class="restaurant-name">{{ selectedRestaurantForCoupon ? selectedRestaurantForCoupon.name : '' }}</span>
           </div>
         </div>
         <div class="modal-actions">
           <button 
             class="modal-btn primary" 
             @click="claimAndUseCoupon"
-            :disabled="selectedCouponForDetail?.claimed"
+            :disabled="selectedCouponForDetail && selectedCouponForDetail.claimed"
           >
-            {{ selectedCouponForDetail?.claimed ? '已领取' : '立即领取并使用' }}
+            {{ selectedCouponForDetail && selectedCouponForDetail.claimed ? '已领取' : '立即领取并使用' }}
           </button>
         </div>
       </div>
@@ -612,7 +612,7 @@ export default {
     },
     claimAndUseCoupon () {
       if (!this.selectedCouponForDetail) return
-      
+
       if (this.selectedCouponForDetail.claimed) {
         this.showToast('ℹ️', '您已领取过该优惠券')
         return
@@ -620,7 +620,7 @@ export default {
 
       this.selectedCouponForDetail.claimed = true
       this.showToast('✅', `领取成功！¥${this.selectedCouponForDetail.value}优惠券已到账`)
-      
+
       setTimeout(() => {
         this.hideCouponModal()
         if (this.selectedRestaurantForCoupon) {
