@@ -121,9 +121,10 @@
       </div>
       
       <div class="settings-list">
-        <div class="settings-item" @click="showToast('⚙️', '消息设置功能开发中...')">
+        <div class="settings-item" @click="goToNotifications">
           <span class="settings-icon">🔔</span>
           <span class="settings-label">消息通知</span>
+          <span class="settings-badge" v-show="unreadCount > 0">{{ unreadCount }}</span>
           <span class="settings-arrow">›</span>
         </div>
         
@@ -214,6 +215,11 @@ export default {
       ]
     }
   },
+  computed: {
+    unreadCount () {
+      return 5
+    }
+  },
   methods: {
     toggleEditMode () {
       if (this.isEditMode) {
@@ -296,6 +302,9 @@ export default {
       setTimeout(() => {
         this.showToastVisible = false
       }, 2000)
+    },
+    goToNotifications () {
+      this.$router.push('/notifications')
     }
   }
 }
@@ -533,6 +542,20 @@ export default {
   flex: 1
   font-size: px2rem(28px)
   color: #333
+
+.settings-badge
+  min-width: px2rem(40px)
+  height: px2rem(40px)
+  background-color: #ff6b6b
+  color: #fff
+  font-size: px2rem(22px)
+  font-weight: bold
+  border-radius: px2rem(20px)
+  display: flex
+  align-items: center
+  justify-content: center
+  padding: 0 px2rem(12px)
+  margin-right: px2rem(16px)
 
 .settings-arrow
   font-size: px2rem(32px)
