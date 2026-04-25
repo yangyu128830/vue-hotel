@@ -859,9 +859,51 @@ export default {
         this.showToast('✅', '优惠券领取成功！')
       }, 1500)
     },
+    getFoodDescription (food) {
+      const descriptions = {
+        101: '老北京火锅传承百年老北京涮羊肉技艺，选用内蒙锡林郭勒草原优质羊肉，肉质鲜嫩，不膻不腻。锅底采用大骨熬制8小时，汤底浓郁醇厚。店内环境古色古香，服务热情周到，是朋友聚餐、家庭聚会的绝佳选择。',
+        102: '川味烧烤秉承正宗川渝烧烤风味，独家秘制酱料，选用新鲜食材，每日现切现串。特色菜品包括烤五花肉、烤鸡翅、烤茄子等，麻辣鲜香，回味无穷。深夜不打烊，是宵夜小聚的好去处。',
+        103: '喜茶HEYTEA致力于为消费者提供高品质的茶饮体验。严选世界各地优质茶叶，采用新鲜水果，用心打造每一杯好茶。招牌产品多肉葡萄、芝芝莓莓深受消费者喜爱。店内环境简约时尚，适合朋友小聚。',
+        104: '肯德基KFC全球知名快餐品牌，以炸鸡、汉堡为主打产品。精选优质鸡肉，独家配方腌制，外酥里嫩。提供早餐、午餐、晚餐、宵夜全天服务，是快捷用餐的理想选择。',
+        105: '寿司之神传承正宗日式寿司技艺，选用当日新鲜海产，由经验丰富的寿司师傅现场制作。招牌三文鱼寿司、金枪鱼寿司口感鲜美，是日料爱好者的天堂。店内环境优雅，服务专业。',
+        106: '麦当劳McDonalds全球知名快餐品牌，以汉堡、薯条、麦旋风等产品深受消费者喜爱。提供超值套餐、开心乐园餐等多种选择，全天24小时服务，是家庭聚餐、快捷用餐的首选。',
+        107: '星巴克Starbucks全球知名咖啡品牌，提供多种高品质咖啡饮品。精选世界各地优质咖啡豆，专业咖啡师手工制作。除咖啡外，还提供各种甜点、轻食，是商务洽谈、休闲小憩的理想场所。',
+        108: '杨国福麻辣烫源自东北的知名麻辣烫品牌，以独特的骨汤汤底和丰富的食材选择著称。提供数十种新鲜食材，消费者可自由搭配。汤底浓郁，味道鲜美，价格实惠，深受消费者喜爱。',
+        109: '必胜客Pizza Hut全球知名披萨品牌，以手工制作披萨为主打产品。精选优质面粉、新鲜食材，多种口味选择。除披萨外，还提供意面、焗饭、小吃等，是家庭聚餐、朋友聚会的好去处。',
+        110: '一点点奶茶源自台湾的知名奶茶品牌，以新鲜、健康、美味为理念。提供多种茶饮产品，招牌波霸奶茶、四季奶青深受消费者喜爱。价格实惠，口味丰富，是年轻人喜爱的茶饮品牌。',
+        111: '海底捞火锅以极致服务和优质菜品著称的知名火锅品牌。特色服务包括美甲、擦鞋、儿童游乐区等。招牌菜品有毛肚、虾滑、牛肉等，食材新鲜，味道正宗。是家庭聚餐、朋友聚会的热门选择。',
+        112: '汉堡王Burger King全球知名快餐品牌，以"火烤"为特色。招牌皇堡系列汉堡，采用火烤牛肉饼，口感独特。提供多种汉堡、薯条、饮品选择，价格实惠，是快捷用餐的好选择。'
+      }
+      return descriptions[food.id] || `${food.name}是一家深受消费者喜爱的美食商家，提供优质的菜品和贴心的服务。食材新鲜，味道正宗，价格实惠，是休闲用餐的绝佳选择。`
+    },
     viewFoodDetail (food) {
-      console.log('查看美食详情:', food.name)
-      this.showToast('🍽️', '美食详情页面开发中...')
+      const foodData = {
+        id: food.id,
+        name: food.name,
+        image: food.image,
+        rating: food.rating,
+        ratingCount: food.ratingCount,
+        orderCount: food.orderCount || 0,
+        location: food.location,
+        distance: food.distanceValue || 2,
+        tags: food.tags || [],
+        description: this.getFoodDescription(food)
+      }
+      this.$router.push({
+        name: 'FoodDetail',
+        params: { restaurantId: foodData.id },
+        query: {
+          name: foodData.name,
+          image: foodData.image,
+          rating: foodData.rating,
+          ratingCount: foodData.ratingCount,
+          orderCount: foodData.orderCount,
+          location: foodData.location,
+          distance: foodData.distance,
+          tags: foodData.tags.join(','),
+          description: foodData.description
+        }
+      })
     },
     showToast (icon, message) {
       this.toastIcon = icon
