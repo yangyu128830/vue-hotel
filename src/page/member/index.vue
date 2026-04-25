@@ -753,20 +753,20 @@ export default {
   cursor: not-allowed
 
 .benefits-comparison
-  border: px2rem(2px) solid #f0f0f0
-  border-radius: px2rem(16px)
+  border: px2rem(1px) solid #f0f0f0
+  border-radius: px2rem(12px)
   overflow: hidden
 
 .comparison-header
   display: flex
   background-color: #f8f8f8
-  border-bottom: px2rem(2px) solid #f0f0f0
+  border-bottom: px2rem(1px) solid #f0f0f0
 
 .comparison-item
   flex: 1
-  padding: px2rem(24px)
+  padding: px2rem(12px) px2rem(8px)
   text-align: center
-  font-size: px2rem(24px)
+  font-size: px2rem(20px)
   color: #666
   border-right: px2rem(1px) solid #f0f0f0
 
@@ -789,8 +789,8 @@ export default {
 
 .group-title
   background-color: #fafafa
-  padding: px2rem(20px) px2rem(24px)
-  font-size: px2rem(26px)
+  padding: px2rem(10px) px2rem(16px)
+  font-size: px2rem(22px)
   font-weight: bold
   color: #333
   border-bottom: px2rem(1px) solid #f0f0f0
@@ -803,25 +803,25 @@ export default {
     border-bottom: none
 
   .comparison-item
-    font-size: px2rem(22px)
-    padding: px2rem(20px) px2rem(16px)
+    font-size: px2rem(18px)
+    padding: px2rem(8px) px2rem(6px)
     display: flex
     align-items: center
     justify-content: center
 
     &.benefit-name
       justify-content: flex-start
-      padding-left: px2rem(40px)
+      padding-left: px2rem(20px)
       color: #333
 
 .has-benefit
   color: #06c1ae
-  font-size: px2rem(36px)
+  font-size: px2rem(24px)
   font-weight: bold
 
 .no-benefit
   color: #ccc
-  font-size: px2rem(36px)
+  font-size: px2rem(24px)
 
 .rules-container
   display: grid
