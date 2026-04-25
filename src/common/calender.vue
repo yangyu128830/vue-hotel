@@ -182,7 +182,6 @@
         console.log(item)
         let startTime = this.startDate.time
         let endTime = this.endDate.time
-        // 钟点房
         if (this.onlyOne) {
           console.log('ok')
           this.startDate = item
@@ -203,6 +202,10 @@
             this.startDate = item
           }
         }
+        this.$emit('dateChange', {
+          startDate: this.startDate,
+          endDate: this.endDate
+        })
       },
       asureClick () {
         let startTime = this.startDate.time

@@ -56,7 +56,7 @@
       <span class="tab-search-clear hue-base-icon-base" @click.stop="deleteKeyword">✘</span>
     </div>
     <div class="tab-btn">
-      <button type="button" class="hue-base-button-block-btn-green">查找酒店</button>
+      <button type="button" class="hue-base-button-block-btn-green" @click="searchHotels">查找酒店</button>
     </div>
   </div>
 </template>
@@ -161,6 +161,19 @@
       },
       deleteKeyword () {
         this.KEYWORD('')
+      },
+      searchHotels () {
+        this.$router.push({
+          path: '/hotel-list',
+          query: {
+            cityId: this.city.cityId,
+            cityName: this.city.cityName,
+            checkinDate: this.checkinDate,
+            checkoutDate: this.checkoutDate,
+            keyword: this.keyword,
+            roomType: this.roomType
+          }
+        })
       }
     }
   }
@@ -170,11 +183,12 @@
   @import 'src/style/common'
   .search-page--box
     background: #fff;
-    border-top-left-radius: px2rem(6px);
-    border-top-right-radius: px2rem(6px);
-    @include size('margin',-110px 20px 0px 20px);
-    border: 1px solid #f3f3f3;
-    border-radius: px2rem(10px);
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    @include size('margin',0px 0px 0px 0px);
+    border: none;
+    border-radius: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     .search-header
       border-bottom: 1px solid #f3f3f3;
       display: flex;
