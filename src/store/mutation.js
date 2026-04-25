@@ -7,7 +7,10 @@ import {
   IS_SHOW_DATE_PICKER,
   CHECK_IN_OUT_INFO,
   IS_SHOW_QUERY_SELETOR,
-  LETTERS_CONFIG
+  LETTERS_CONFIG,
+  SET_CURRENT_USER,
+  SET_LOGGED_ACCOUNTS,
+  LOGOUT
 } from './mutation-types.js'
 
 export default {
@@ -41,5 +44,14 @@ export default {
   },
   [LETTERS_CONFIG] (state, LETTERS_CONFIG) {
     state.lettersConfig = LETTERS_CONFIG
+  },
+  [SET_CURRENT_USER] (state, user) {
+    state.currentUser = user
+  },
+  [SET_LOGGED_ACCOUNTS] (state, accounts) {
+    state.loggedAccounts = accounts
+  },
+  [LOGOUT] (state) {
+    state.currentUser = null
   }
 }

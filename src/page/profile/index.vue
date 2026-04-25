@@ -134,7 +134,7 @@
           <span class="settings-arrow">›</span>
         </div>
         
-        <div class="settings-item" @click="showToast('🔐', '安全设置功能开发中...')">
+        <div class="settings-item" @click="goToAccountSecurity">
           <span class="settings-icon">🔐</span>
           <span class="settings-label">账号安全</span>
           <span class="settings-arrow">›</span>
@@ -159,6 +159,15 @@
       <span class="toast-text">{{ toastMessage }}</span>
     </div>
 
+    <div class="action-buttons">
+      <button class="switch-account-btn" @click="showSwitchAccountModal">
+        切换账号
+      </button>
+      <button class="logout-btn" @click="handleLogout">
+        退出登录
+      </button>
+    </div>
+
     <div class="avatar-modal-overlay" v-show="showAvatarEdit" @click="hideAvatarModal">
       <div class="avatar-modal" @click.stop>
         <div class="modal-title">更换头像</div>
@@ -175,10 +184,38 @@
         <div class="cancel-btn" @click="hideAvatarModal">取消</div>
       </div>
     </div>
+
+    <div class="switch-account-overlay" v-show="showSwitchAccount" @click="hideSwitchAccountModal">
+      <div class="switch-account-modal" @click.stop>
+        <div class="modal-title">切换账号</div>
+        <div class="account-list">
+          <div 
+            v-for="account in loggedAccounts" 
+            :key="account.id"
+            class="account-item"
+            :class="{ active: currentUser && currentUser.id === account.id }"
+            @click="switchToAccount(account)"
+          >
+            <img :src="account.avatar" :alt="account.name" class="account-avatar" />
+            <div class="account-info">
+              <div class="account-name">{{ account.name }}</div>
+              <div class="account-username">账号：{{ account.username }}</div>
+            </div>
+            <span v-if="currentUser && currentUser.id === account.id" class="current-tag">当前</span>
+          </div>
+        </div>
+        <div class="add-account-btn" @click="goToLogin">
+          <span class="add-icon">➕</span>
+          <span class="add-text">添加新账号</span>
+        </div>
+        <div class="cancel-btn" @click="hideSwitchAccountModal">取消</div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex'
 export default {
   name: 'ProfilePage',
   data () {
@@ -188,6 +225,7 @@ export default {
       toastMessage: '',
       toastIcon: '✅',
       showAvatarEdit: false,
+      showSwitchAccount: false,
       userInfo: {
         id: '10086',
         name: '张三',
@@ -216,6 +254,10 @@ export default {
     }
   },
   computed: {
+    ...mapState({
+      currentUser: 'currentUser',
+      loggedAccounts: 'loggedAccounts'
+    }),
     unreadCount () {
       return 5
     }
@@ -308,6 +350,36 @@ export default {
     },
     goToCustomerService () {
       this.$router.push('/customer-service')
+    },
+    goToAccountSecurity () {
+      this.$router.push('/account-security')
+    },
+    showSwitchAccountModal () {
+      this.showSwitchAccount = true
+    },
+    hideSwitchAccountModal () {
+      this.showSwitchAccount = false
+    },
+    handleLogout () {
+      this.$store.commit('LOGOUT')
+      this.showToast('👋', '已退出登录')
+      setTimeout(() => {
+        this.$router.push('/login')
+      }, 1000)
+    },
+    switchToAccount (account) {
+      if (this.currentUser && this.currentUser.id === account.id) {
+        this.showToast('ℹ️', '当前已是该账号')
+        return
+      }
+
+      this.$store.commit('SET_CURRENT_USER', account)
+      this.hideSwitchAccountModal()
+      this.showToast('✅', '切换成功')
+    },
+    goToLogin () {
+      this.hideSwitchAccountModal()
+      this.$router.push('/login')
     }
   }
 }
@@ -651,4 +723,132 @@ export default {
   background-color: #f5f5f5
   border-radius: px2rem(12px)
   cursor: pointer
+
+.action-buttons
+  display: flex
+  gap: px2rem(30px)
+  padding: px2rem(40px) px2rem(30px)
+  margin-top: px2rem(20px)
+
+.switch-account-btn
+  flex: 1
+  padding: px2rem(30px)
+  background: linear-gradient(135deg, #2196f3, #1976d2)
+  color: #fff
+  font-size: px2rem(32px)
+  font-weight: bold
+  border: none
+  border-radius: px2rem(12px)
+  cursor: pointer
+  transition: all 0.3s
+  box-shadow: 0 4px 16px rgba(33, 150, 243, 0.4)
+
+  &:active
+    transform: scale(0.98)
+
+.logout-btn
+  flex: 1
+  padding: px2rem(30px)
+  background: linear-gradient(135deg, #f44336, #d32f2f)
+  color: #fff
+  font-size: px2rem(32px)
+  font-weight: bold
+  border: none
+  border-radius: px2rem(12px)
+  cursor: pointer
+  transition: all 0.3s
+  box-shadow: 0 4px 16px rgba(244, 67, 54, 0.4)
+
+  &:active
+    transform: scale(0.98)
+
+.switch-account-overlay
+  position: fixed
+  top: 0
+  left: 0
+  right: 0
+  bottom: 0
+  background-color: rgba(0, 0, 0, 0.5)
+  z-index: 1000
+  display: flex
+  align-items: flex-end
+
+.switch-account-modal
+  width: 100%
+  background-color: #fff
+  border-top-left-radius: px2rem(24px)
+  border-top-right-radius: px2rem(24px)
+  padding: px2rem(40px)
+  max-height: 80vh
+  overflow-y: auto
+
+.account-list
+  margin-bottom: px2rem(30px)
+
+.account-item
+  display: flex
+  align-items: center
+  padding: px2rem(30px)
+  margin-bottom: px2rem(20px)
+  background-color: #f8f8f8
+  border-radius: px2rem(16px)
+  cursor: pointer
+  transition: all 0.2s
+
+  &:active
+    background-color: #f0f9f8
+
+  &.active
+    background-color: rgba(6, 193, 174, 0.1)
+    border: px2rem(2px) solid #06c1ae
+
+.account-avatar
+  width: px2rem(100px)
+  height: px2rem(100px)
+  border-radius: 50%
+  object-fit: cover
+  margin-right: px2rem(30px)
+
+.account-info
+  flex: 1
+
+.account-name
+  font-size: px2rem(32px)
+  font-weight: bold
+  color: #333
+  margin-bottom: px2rem(8px)
+
+.account-username
+  font-size: px2rem(24px)
+  color: #999
+
+.current-tag
+  padding: px2rem(8px) px2rem(20px)
+  background-color: #06c1ae
+  color: #fff
+  font-size: px2rem(24px)
+  border-radius: px2rem(20px)
+
+.add-account-btn
+  display: flex
+  align-items: center
+  justify-content: center
+  padding: px2rem(30px)
+  margin-bottom: px2rem(30px)
+  background-color: #f8f8f8
+  border-radius: px2rem(16px)
+  cursor: pointer
+  transition: all 0.2s
+
+  &:active
+    background-color: #f0f9f8
+
+.add-icon
+  font-size: px2rem(40px)
+  margin-right: px2rem(16px)
+
+.add-text
+  font-size: px2rem(30px)
+  color: #06c1ae
+  font-weight: bold
 </style>
