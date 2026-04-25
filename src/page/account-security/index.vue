@@ -12,59 +12,91 @@
       </div>
 
       <div class="password-form">
-        <div class="form-group">
-          <span class="form-label">原密码</span>
-          <div class="input-wrapper">
-            <input 
-              :type="showOldPassword ? 'text' : 'password'" 
-              v-model="passwordForm.oldPassword" 
-              class="form-input"
-              placeholder="请输入原密码"
-            />
-            <span class="password-toggle" @click="showOldPassword = !showOldPassword">
-              {{ showOldPassword ? '🙈' : '👁️' }}
-            </span>
+        <div class="step-indicator">
+          <div class="step-item" :class="{ active: step === 1, completed: step > 1 }">
+            <span class="step-number">{{ step > 1 ? '✓' : '1' }}</span>
+            <span class="step-text">验证原密码</span>
+          </div>
+          <div class="step-line" :class="{ active: step > 1 }"></div>
+          <div class="step-item" :class="{ active: step === 2, completed: step > 2 }">
+            <span class="step-number">{{ step > 2 ? '✓' : '2' }}</span>
+            <span class="step-text">设置新密码</span>
           </div>
         </div>
 
-        <div class="form-group">
-          <span class="form-label">新密码</span>
-          <div class="input-wrapper">
-            <input 
-              :type="showNewPassword ? 'text' : 'password'" 
-              v-model="passwordForm.newPassword" 
-              class="form-input"
-              placeholder="请输入新密码"
-            />
-            <span class="password-toggle" @click="showNewPassword = !showNewPassword">
-              {{ showNewPassword ? '🙈' : '👁️' }}
-            </span>
+        <div v-if="step === 1" class="step-content">
+          <div class="step-desc">请先输入您的原密码进行身份验证</div>
+          
+          <div class="form-group">
+            <span class="form-label">原密码</span>
+            <div class="input-wrapper">
+              <input 
+                :type="showOldPassword ? 'text' : 'password'" 
+                v-model="passwordForm.oldPassword" 
+                class="form-input"
+                placeholder="请输入原密码"
+                @keyup.enter="verifyOldPassword"
+              />
+              <span class="password-toggle" @click="showOldPassword = !showOldPassword">
+                {{ showOldPassword ? '🙈' : '👁️' }}
+              </span>
+            </div>
+          </div>
+
+          <button class="submit-btn" @click="verifyOldPassword">
+            下一步
+          </button>
+        </div>
+
+        <div v-if="step === 2" class="step-content">
+          <div class="step-desc">请设置您的新密码</div>
+          
+          <div class="form-group">
+            <span class="form-label">新密码</span>
+            <div class="input-wrapper">
+              <input 
+                :type="showNewPassword ? 'text' : 'password'" 
+                v-model="passwordForm.newPassword" 
+                class="form-input"
+                placeholder="请输入新密码"
+                @keyup.enter="handleChangePassword"
+              />
+              <span class="password-toggle" @click="showNewPassword = !showNewPassword">
+                {{ showNewPassword ? '🙈' : '👁️' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <span class="form-label">确认新密码</span>
+            <div class="input-wrapper">
+              <input 
+                :type="showConfirmPassword ? 'text' : 'password'" 
+                v-model="passwordForm.confirmPassword" 
+                class="form-input"
+                placeholder="请再次输入新密码"
+                @keyup.enter="handleChangePassword"
+              />
+              <span class="password-toggle" @click="showConfirmPassword = !showConfirmPassword">
+                {{ showConfirmPassword ? '🙈' : '👁️' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="password-tips">
+            <span class="tips-icon">💡</span>
+            <span class="tips-text">密码长度至少6位，建议包含字母、数字和特殊字符</span>
+          </div>
+
+          <div class="button-group">
+            <button class="back-btn" @click="goBackStep">
+              上一步
+            </button>
+            <button class="submit-btn" @click="handleChangePassword">
+              确认修改
+            </button>
           </div>
         </div>
-
-        <div class="form-group">
-          <span class="form-label">确认新密码</span>
-          <div class="input-wrapper">
-            <input 
-              :type="showConfirmPassword ? 'text' : 'password'" 
-              v-model="passwordForm.confirmPassword" 
-              class="form-input"
-              placeholder="请再次输入新密码"
-            />
-            <span class="password-toggle" @click="showConfirmPassword = !showConfirmPassword">
-              {{ showConfirmPassword ? '🙈' : '👁️' }}
-            </span>
-          </div>
-        </div>
-
-        <div class="password-tips">
-          <span class="tips-icon">💡</span>
-          <span class="tips-text">密码长度至少6位，建议包含字母、数字和特殊字符</span>
-        </div>
-
-        <button class="submit-btn" @click="handleChangePassword">
-          确认修改
-        </button>
       </div>
     </div>
 
@@ -117,6 +149,7 @@ export default {
   name: 'AccountSecurityPage',
   data () {
     return {
+      step: 1,
       passwordForm: {
         oldPassword: '',
         newPassword: '',
@@ -140,11 +173,30 @@ export default {
     goBack () {
       this.$router.back()
     },
-    handleChangePassword () {
+    verifyOldPassword () {
       if (!this.passwordForm.oldPassword.trim()) {
         this.showToast('❌', '请输入原密码')
         return
       }
+
+      if (this.currentUser) {
+        if (this.passwordForm.oldPassword !== this.currentUser.password) {
+          this.showToast('❌', '原密码错误')
+          return
+        }
+
+        this.step = 2
+        this.showToast('✅', '验证成功，请设置新密码')
+      } else {
+        this.showToast('❌', '请先登录')
+      }
+    },
+    goBackStep () {
+      this.step = 1
+      this.passwordForm.newPassword = ''
+      this.passwordForm.confirmPassword = ''
+    },
+    handleChangePassword () {
       if (!this.passwordForm.newPassword.trim()) {
         this.showToast('❌', '请输入新密码')
         return
@@ -163,11 +215,6 @@ export default {
       }
 
       if (this.currentUser) {
-        if (this.passwordForm.oldPassword !== this.currentUser.password) {
-          this.showToast('❌', '原密码错误')
-          return
-        }
-
         const updatedUser = {
           ...this.currentUser,
           password: this.passwordForm.newPassword
@@ -189,6 +236,7 @@ export default {
           newPassword: '',
           confirmPassword: ''
         }
+        this.step = 1
 
         this.showToast('✅', '密码修改成功')
       } else {
@@ -269,6 +317,110 @@ export default {
   border: px2rem(1px) solid #f0f0f0
   border-radius: px2rem(12px)
   padding: px2rem(30px)
+
+.step-indicator
+  display: flex
+  align-items: center
+  justify-content: center
+  margin-bottom: px2rem(40px)
+  padding: px2rem(20px)
+
+.step-item
+  display: flex
+  flex-direction: column
+  align-items: center
+  position: relative
+
+  &.active
+    .step-number
+      background: linear-gradient(135deg, #06c1ae, #0a9d8c)
+      color: #fff
+      box-shadow: 0 4px 12px rgba(6, 193, 174, 0.4)
+
+    .step-text
+      color: #06c1ae
+      font-weight: bold
+
+  &.completed
+    .step-number
+      background: linear-gradient(135deg, #4caf50, #388e3c)
+      color: #fff
+
+    .step-text
+      color: #4caf50
+
+.step-number
+  width: px2rem(80px)
+  height: px2rem(80px)
+  border-radius: 50%
+  background-color: #f0f0f0
+  color: #999
+  font-size: px2rem(36px)
+  font-weight: bold
+  display: flex
+  align-items: center
+  justify-content: center
+  margin-bottom: px2rem(12px)
+  transition: all 0.3s
+
+.step-text
+  font-size: px2rem(24px)
+  color: #999
+  transition: color 0.3s
+
+.step-line
+  width: px2rem(120px)
+  height: px2rem(4px)
+  background-color: #f0f0f0
+  margin: 0 px2rem(20px)
+  margin-bottom: px2rem(40px)
+  transition: background-color 0.3s
+
+  &.active
+    background: linear-gradient(90deg, #4caf50, #06c1ae)
+
+.step-content
+  animation: fadeIn 0.3s ease-in-out
+
+.step-desc
+  text-align: center
+  font-size: px2rem(28px)
+  color: #666
+  margin-bottom: px2rem(40px)
+  padding: px2rem(20px)
+  background-color: #f8f9fa
+  border-radius: px2rem(12px)
+
+.button-group
+  display: flex
+  gap: px2rem(30px)
+
+  .back-btn
+    flex: 1
+    padding: px2rem(36px)
+    background-color: #f5f5f5
+    color: #666
+    font-size: px2rem(32px)
+    font-weight: bold
+    border: none
+    border-radius: px2rem(16px)
+    cursor: pointer
+    transition: all 0.3s
+
+    &:active
+      transform: scale(0.98)
+      background-color: #e0e0e0
+
+  .submit-btn
+    flex: 2
+
+@keyframes fadeIn
+  from
+    opacity: 0
+    transform: translateY(10px)
+  to
+    opacity: 1
+    transform: translateY(0)
 
 .form-group
   margin-bottom: px2rem(40px)
