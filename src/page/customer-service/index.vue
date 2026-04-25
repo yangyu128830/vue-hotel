@@ -1,19 +1,36 @@
 <template>
   <div class="customer-service-page">
     <div class="page-header">
-      <div class="header-left" @click="goBack">
+      <div class="header-left" @click="handleBack">
         <span class="back-icon">‹</span>
       </div>
-      <div class="header-title">在线客服</div>
-      <div class="header-right" @click="showHistoryRecords">
+      <div class="header-title">
+        <span v-if="!isViewingHistory">在线客服</span>
+        <span v-else class="history-mode-badge">历史对话</span>
+      </div>
+      <div class="header-right" v-if="!isViewingHistory" @click="showHistoryRecords">
         <span class="history-text">历史记录</span>
       </div>
+      <div class="header-right" v-else @click="returnToCurrentSession">
+        <span class="return-text">返回</span>
+      </div>
+    </div>
+
+    <div class="history-session-header" v-if="isViewingHistory && currentViewingSession">
+      <div class="session-info-bar">
+        <span class="session-icon">📋</span>
+        <div class="session-detail">
+          <div class="session-name">{{ currentViewingSession.title }}</div>
+          <div class="session-time">{{ formatDate(currentViewingSession.date) }} · {{ currentViewingSession.messageCount }}条消息</div>
+        </div>
+      </div>
+      <div class="history-badge-text">历史记录模式</div>
     </div>
 
     <div class="chat-container" ref="chatContainer">
       <div class="chat-messages" ref="chatMessages">
         <div
-          v-for="(message, index) in currentMessages"
+          v-for="(message, index) in displayMessages"
           :key="message.id"
           class="message-item"
           :class="{
@@ -44,7 +61,7 @@
               </div>
             </div>
 
-            <div v-if="message.sender === 'user' && !message.isRecalled" class="message-actions">
+            <div v-if="message.sender === 'user' && !message.isRecalled && !isViewingHistory" class="message-actions">
               <span class="action-btn" @click.stop="recallMessage(message)" :class="{ disabled: !canRecall(message) }">
                 撤回
               </span>
@@ -58,7 +75,7 @@
       </div>
     </div>
 
-    <div class="input-container">
+    <div class="input-container" v-if="!isViewingHistory">
       <div class="input-actions">
         <span class="action-icon" @click="toggleEmojiPicker">😊</span>
         <span class="action-icon" @click="selectImage">🖼️</span>
@@ -76,6 +93,14 @@
 
       <div class="send-btn" @click="sendMessage" :class="{ disabled: !inputMessage.trim() }">
         发送
+      </div>
+    </div>
+
+    <div class="history-hint-bar" v-else>
+      <div class="hint-icon">💡</div>
+      <span class="hint-text">您正在查看历史对话记录，如需咨询请返回当前会话</span>
+      <div class="back-to-current-btn" @click="returnToCurrentSession">
+        返回当前会话
       </div>
     </div>
 
@@ -104,6 +129,7 @@
             v-for="session in historySessions"
             :key="session.id"
             class="history-session"
+            :class="{ active: currentViewingSession && currentViewingSession.id === session.id }"
             @click="viewHistorySession(session)"
           >
             <div class="session-info">
@@ -133,13 +159,13 @@
 
     <div class="message-menu-overlay" v-show="showMenu" @click="hideMessageMenu">
       <div class="message-menu" :style="menuStyle">
-        <div class="menu-item" @click="recallMessage(currentMenuMessage)" :class="{ disabled: !canRecall(currentMenuMessage) }">
+        <div class="menu-item" @click="recallMessage(currentMenuMessage)" :class="{ disabled: !canRecall(currentMenuMessage) || isViewingHistory }">
           撤回消息
         </div>
         <div class="menu-item" @click="copyMessage">
           复制消息
         </div>
-        <div class="menu-item delete" @click="deleteMessage">
+        <div class="menu-item delete" @click="deleteMessage" :class="{ disabled: isViewingHistory }">
           删除消息
         </div>
       </div>
@@ -162,6 +188,8 @@ export default {
       showMenu: false,
       currentMenuMessage: null,
       menuStyle: { top: '0px', left: '0px' },
+      isViewingHistory: false,
+      currentViewingSession: null,
       userAvatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=user%20avatar%20portrait%20professional%20headshot%20friendly&image_size=square',
       serviceAvatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=customer%20service%20avatar%20friendly%20assistant%20icon&image_size=square',
       currentMessages: [
@@ -212,35 +240,410 @@ export default {
           title: '酒店预订问题咨询',
           preview: '您好，我想咨询一下酒店预订的退款政策...',
           date: new Date(Date.now() - 86400000 * 2),
-          messageCount: 15
+          messageCount: 15,
+          messages: [
+            {
+              id: 101,
+              sender: 'service',
+              type: 'text',
+              content: '您好，欢迎使用在线客服！我是客服小助手，有什么可以帮助您的吗？',
+              time: new Date(Date.now() - 86400000 * 2 - 3600000),
+              isRecalled: false
+            },
+            {
+              id: 102,
+              sender: 'user',
+              type: 'text',
+              content: '您好，我想咨询一下酒店预订的退款政策。',
+              time: new Date(Date.now() - 86400000 * 2 - 3500000),
+              isRecalled: false
+            },
+            {
+              id: 103,
+              sender: 'service',
+              type: 'text',
+              content: '好的，关于退款政策，我为您说明一下：',
+              time: new Date(Date.now() - 86400000 * 2 - 3400000),
+              isRecalled: false
+            },
+            {
+              id: 104,
+              sender: 'service',
+              type: 'text',
+              content: '1. 如果是提前24小时以上取消预订，可以获得全额退款；\n2. 如果是提前12-24小时取消，退款80%；\n3. 如果是提前12小时内取消，退款50%；\n4. 如果是预订当天取消，不予退款。',
+              time: new Date(Date.now() - 86400000 * 2 - 3300000),
+              isRecalled: false
+            },
+            {
+              id: 105,
+              sender: 'user',
+              type: 'text',
+              content: '那如果我是因为疫情原因无法入住呢？',
+              time: new Date(Date.now() - 86400000 * 2 - 3200000),
+              isRecalled: false
+            },
+            {
+              id: 106,
+              sender: 'service',
+              type: 'text',
+              content: '如果是疫情等不可抗力因素，我们会根据具体情况给予特殊处理。您可以提供相关证明材料，我们会为您申请全额退款。',
+              time: new Date(Date.now() - 86400000 * 2 - 3100000),
+              isRecalled: false
+            },
+            {
+              id: 107,
+              sender: 'user',
+              type: 'text',
+              content: '好的，我明白了。谢谢！',
+              time: new Date(Date.now() - 86400000 * 2 - 3000000),
+              isRecalled: false
+            },
+            {
+              id: 108,
+              sender: 'service',
+              type: 'text',
+              content: '不客气！请问还有其他问题吗？',
+              time: new Date(Date.now() - 86400000 * 2 - 2900000),
+              isRecalled: false
+            },
+            {
+              id: 109,
+              sender: 'user',
+              type: 'text',
+              content: '没有了，谢谢您的解答。',
+              time: new Date(Date.now() - 86400000 * 2 - 2800000),
+              isRecalled: false
+            },
+            {
+              id: 110,
+              sender: 'service',
+              type: 'text',
+              content: '感谢您的咨询，祝您生活愉快！如果后续有任何问题，欢迎随时联系我们。',
+              time: new Date(Date.now() - 86400000 * 2 - 2700000),
+              isRecalled: false
+            },
+            {
+              id: 111,
+              sender: 'service',
+              type: 'text',
+              content: '另外，我们最近有会员优惠活动，您可以了解一下哦。',
+              time: new Date(Date.now() - 86400000 * 2 - 2600000),
+              isRecalled: false
+            },
+            {
+              id: 112,
+              sender: 'user',
+              type: 'text',
+              content: '好的，我会关注的。',
+              time: new Date(Date.now() - 86400000 * 2 - 2500000),
+              isRecalled: false
+            },
+            {
+              id: 113,
+              sender: 'service',
+              type: 'text',
+              content: '非常感谢！期待再次为您服务。',
+              time: new Date(Date.now() - 86400000 * 2 - 2400000),
+              isRecalled: false
+            },
+            {
+              id: 114,
+              sender: 'service',
+              type: 'image',
+              content: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=hotel%20discount%20promotion%20banner%20colorful&image_size=square',
+              time: new Date(Date.now() - 86400000 * 2 - 2300000),
+              isRecalled: false
+            },
+            {
+              id: 115,
+              sender: 'service',
+              type: 'text',
+              content: '这是我们的优惠活动宣传图，欢迎了解一下！',
+              time: new Date(Date.now() - 86400000 * 2 - 2200000),
+              isRecalled: false
+            }
+          ]
         },
         {
           id: 'session_002',
           title: '会员权益咨询',
           preview: '请问黄金会员有哪些专属权益呢？',
           date: new Date(Date.now() - 86400000 * 5),
-          messageCount: 8
+          messageCount: 8,
+          messages: [
+            {
+              id: 201,
+              sender: 'service',
+              type: 'text',
+              content: '您好，欢迎使用在线客服！我是客服小助手，有什么可以帮助您的吗？',
+              time: new Date(Date.now() - 86400000 * 5 - 3600000),
+              isRecalled: false
+            },
+            {
+              id: 202,
+              sender: 'user',
+              type: 'text',
+              content: '请问黄金会员有哪些专属权益呢？',
+              time: new Date(Date.now() - 86400000 * 5 - 3500000),
+              isRecalled: false
+            },
+            {
+              id: 203,
+              sender: 'service',
+              type: 'text',
+              content: '您好，黄金会员享有以下专属权益：',
+              time: new Date(Date.now() - 86400000 * 5 - 3400000),
+              isRecalled: false
+            },
+            {
+              id: 204,
+              sender: 'service',
+              type: 'text',
+              content: '1. 酒店预订享8.5折优惠\n2. 免费升级房型（视房态而定）\n3. 延迟退房至14:00\n4. 免费早餐（部分酒店）\n5. 积分双倍累积\n6. 专属客服通道',
+              time: new Date(Date.now() - 86400000 * 5 - 3300000),
+              isRecalled: false
+            },
+            {
+              id: 205,
+              sender: 'user',
+              type: 'text',
+              content: '那白金会员呢？权益有什么不一样？',
+              time: new Date(Date.now() - 86400000 * 5 - 3200000),
+              isRecalled: false
+            },
+            {
+              id: 206,
+              sender: 'service',
+              type: 'text',
+              content: '白金会员在黄金会员的基础上，还有：\n- 酒店预订享7.5折优惠\n- 免费行政酒廊权益\n- 机场贵宾厅服务\n- 专属礼品\n- 生日礼遇',
+              time: new Date(Date.now() - 86400000 * 5 - 3100000),
+              isRecalled: false
+            },
+            {
+              id: 207,
+              sender: 'user',
+              type: 'text',
+              content: '好的，谢谢！我考虑升级到黄金会员。',
+              time: new Date(Date.now() - 86400000 * 5 - 3000000),
+              isRecalled: false
+            },
+            {
+              id: 208,
+              sender: 'service',
+              type: 'text',
+              content: '感谢您的选择！您可以在个人中心-会员页面进行升级操作。如有问题随时联系我们！',
+              time: new Date(Date.now() - 86400000 * 5 - 2900000),
+              isRecalled: false
+            }
+          ]
         },
         {
           id: 'session_003',
           title: '订单问题反馈',
           preview: '我的订单显示已支付，但状态还是待支付...',
           date: new Date(Date.now() - 86400000 * 10),
-          messageCount: 22
+          messageCount: 22,
+          messages: [
+            {
+              id: 301,
+              sender: 'service',
+              type: 'text',
+              content: '您好，欢迎使用在线客服！我是客服小助手，有什么可以帮助您的吗？',
+              time: new Date(Date.now() - 86400000 * 10 - 7200000),
+              isRecalled: false
+            },
+            {
+              id: 302,
+              sender: 'user',
+              type: 'text',
+              content: '你好，我遇到了一个问题。',
+              time: new Date(Date.now() - 86400000 * 10 - 7100000),
+              isRecalled: false
+            },
+            {
+              id: 303,
+              sender: 'service',
+              type: 'text',
+              content: '请您请详细描述一下您遇到的问题，我会尽力为您解答。',
+              time: new Date(Date.now() - 86400000 * 10 - 7000000),
+              isRecalled: false
+            },
+            {
+              id: 304,
+              sender: 'user',
+              type: 'text',
+              content: '我的订单显示已支付，但状态还是待支付。',
+              time: new Date(Date.now() - 86400000 * 10 - 6900000),
+              isRecalled: false
+            },
+            {
+              id: 305,
+              sender: 'service',
+              type: 'text',
+              content: '非常抱歉给您带来不便。请问您的订单号是多少？我帮您查询一下。',
+              time: new Date(Date.now() - 86400000 * 10 - 6800000),
+              isRecalled: false
+            },
+            {
+              id: 306,
+              sender: 'user',
+              type: 'text',
+              content: '订单号是HT20260415001',
+              time: new Date(Date.now() - 86400000 * 10 - 6700000),
+              isRecalled: false
+            },
+            {
+              id: 307,
+              sender: 'service',
+              type: 'text',
+              content: '好的，请稍等，我帮您查询一下这个订单的情况...',
+              time: new Date(Date.now() - 86400000 * 10 - 6600000),
+              isRecalled: false
+            },
+            {
+              id: 308,
+              sender: 'service',
+              type: 'text',
+              content: '您好，查询到您的订单确实存在支付状态同步问题。可能是银行系统和我们的系统之间存在延迟。',
+              time: new Date(Date.now() - 86400000 * 10 - 6500000),
+              isRecalled: false
+            },
+            {
+              id: 309,
+              sender: 'user',
+              type: 'text',
+              content: '那什么时候能同步好？',
+              time: new Date(Date.now() - 86400000 * 10 - 6400000),
+              isRecalled: false
+            },
+            {
+              id: 310,
+              sender: 'service',
+              type: 'text',
+              content: '一般这种情况会在30分钟内自动同步。如果超过这个时间之后还没有同步，您可以提供支付截图给我，我帮您手动处理。',
+              time: new Date(Date.now() - 86400000 * 10 - 6300000),
+              isRecalled: false
+            },
+            {
+              id: 311,
+              sender: 'user',
+              type: 'text',
+              content: '好的，我等一会儿看看。',
+              time: new Date(Date.now() - 86400000 * 10 - 6200000),
+              isRecalled: false
+            },
+            {
+              id: 312,
+              sender: 'service',
+              type: 'text',
+              content: '好的，您先等待一下。如果有任何问题，请随时告诉我。',
+              time: new Date(Date.now() - 86400000 * 10 - 6100000),
+              isRecalled: false
+            },
+            {
+              id: 313,
+              sender: 'user',
+              type: 'text',
+              content: '还是不行，已经过了一个小时了。',
+              time: new Date(Date.now() - 86400000 * 10 - 3600000),
+              isRecalled: false
+            },
+            {
+              id: 314,
+              sender: 'service',
+              type: 'text',
+              content: '非常抱歉！请您提供一下支付成功的截图，我帮您手动确认一下。',
+              time: new Date(Date.now() - 86400000 * 10 - 3500000),
+              isRecalled: false
+            },
+            {
+              id: 315,
+              sender: 'user',
+              type: 'image',
+              content: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=payment%20success%20screenshot%20wechat%20alipay&image_size=square',
+              time: new Date(Date.now() - 86400000 * 10 - 3400000),
+              isRecalled: false
+            },
+            {
+              id: 316,
+              sender: 'service',
+              type: 'text',
+              content: '收到您的截图了，我正在帮您手动同步订单状态。请稍等...',
+              time: new Date(Date.now() - 86400000 * 10 - 3300000),
+              isRecalled: false
+            },
+            {
+              id: 317,
+              sender: 'service',
+              type: 'text',
+              content: '您好，您的订单状态已经同步成功了！现在您可以查看订单详情，显示已支付状态。',
+              time: new Date(Date.now() - 86400000 * 10 - 3200000),
+              isRecalled: false
+            },
+            {
+              id: 318,
+              sender: 'user',
+              type: 'text',
+              content: '好的，我看看。',
+              time: new Date(Date.now() - 86400000 * 10 - 3100000),
+              isRecalled: false
+            },
+            {
+              id: 319,
+              sender: 'user',
+              type: 'text',
+              content: '是的，已经显示已支付了。谢谢！',
+              time: new Date(Date.now() - 86400000 * 10 - 3000000),
+              isRecalled: false
+            },
+            {
+              id: 320,
+              sender: 'service',
+              type: 'text',
+              content: '非常感谢您的耐心等待！给您带来不便非常抱歉。',
+              time: new Date(Date.now() - 86400000 * 10 - 2900000),
+              isRecalled: false
+            },
+            {
+              id: 321,
+              sender: 'user',
+              type: 'text',
+              content: '没关系，解决了就好。',
+              time: new Date(Date.now() - 86400000 * 10 - 2800000),
+              isRecalled: false
+            },
+            {
+              id: 322,
+              sender: 'service',
+              type: 'text',
+              content: '感谢您的理解！如果后续有任何问题，欢迎随时联系我们。祝您生活愉快！',
+              time: new Date(Date.now() - 86400000 * 10 - 2700000),
+              isRecalled: false
+            }
+          ]
         }
       ],
       nextMessageId: 6
     }
   },
   computed: {
-
+    displayMessages () {
+      if (this.isViewingHistory && this.currentViewingSession) {
+        return this.currentViewingSession.messages || []
+      }
+      return this.currentMessages
+    }
   },
   mounted () {
     this.scrollToBottom()
   },
   methods: {
-    goBack () {
-      this.$router.back()
+    handleBack () {
+      if (this.isViewingHistory) {
+        this.returnToCurrentSession()
+      } else {
+        this.$router.back()
+      }
     },
     showHistoryRecords () {
       this.showHistory = true
@@ -249,8 +652,27 @@ export default {
       this.showHistory = false
     },
     viewHistorySession (session) {
-      this.showToast('📋', `正在加载"${session.title}"的历史记录...`)
+      console.log('Loading history session:', session.title)
+
+      this.currentViewingSession = session
+      this.isViewingHistory = true
       this.hideHistory()
+
+      this.$nextTick(() => {
+        this.scrollToBottom()
+      })
+
+      this.showToast('✅', '已加载"' + session.title + '"的历史记录')
+    },
+    returnToCurrentSession () {
+      this.isViewingHistory = false
+      this.currentViewingSession = null
+
+      this.$nextTick(() => {
+        this.scrollToBottom()
+      })
+
+      this.showToast('✅', '已返回当前会话')
     },
     sendMessage () {
       if (!this.inputMessage.trim()) {
@@ -346,8 +768,8 @@ export default {
 
       this.currentMenuMessage = message
       this.menuStyle = {
-        top: `${event.clientY}px`,
-        left: `${event.clientX}px`
+        top: event.clientY + 'px',
+        left: event.clientX + 'px'
       }
       this.showMenu = true
     },
@@ -361,6 +783,12 @@ export default {
       }
     },
     recallMessage (message) {
+      if (this.isViewingHistory) {
+        this.showToast('⚠️', '历史记录中的消息无法撤回')
+        this.hideMessageMenu()
+        return
+      }
+
       if (!this.canRecall(message)) {
         this.showToast('⚠️', '该消息已超过撤回时间')
         this.hideMessageMenu()
@@ -401,6 +829,12 @@ export default {
       this.hideMessageMenu()
     },
     deleteMessage () {
+      if (this.isViewingHistory) {
+        this.showToast('⚠️', '历史记录中的消息无法删除')
+        this.hideMessageMenu()
+        return
+      }
+
       if (!this.currentMenuMessage) return
 
       const index = this.currentMessages.findIndex(m => m.id === this.currentMenuMessage.id)
@@ -490,6 +924,10 @@ export default {
   font-weight: 300
 
 .header-title
+  display: flex
+  align-items: center
+
+.history-mode-badge
   font-size: px2rem(36px)
   color: #fff
   font-weight: bold
@@ -502,6 +940,49 @@ export default {
   font-size: px2rem(28px)
   color: #fff
   font-weight: 500
+
+.return-text
+  font-size: px2rem(28px)
+  color: #fff
+  font-weight: 500
+
+.history-session-header
+  background: linear-gradient(135deg, #f0f9f8, #e6f7f5)
+  padding: px2rem(24px) px2rem(30px)
+  border-bottom: 1px solid #d4f0ed
+  display: flex
+  justify-content: space-between
+  align-items: center
+
+.session-info-bar
+  display: flex
+  align-items: center
+
+.session-icon
+  font-size: px2rem(44px)
+  margin-right: px2rem(20px)
+
+.session-detail
+  display: flex
+  flex-direction: column
+
+.session-name
+  font-size: px2rem(30px)
+  font-weight: bold
+  color: #06c1ae
+
+.session-time
+  font-size: px2rem(24px)
+  color: #666
+  margin-top: px2rem(6px)
+
+.history-badge-text
+  background-color: #ffd700
+  color: #8b6914
+  padding: px2rem(8px) px2rem(16px)
+  border-radius: px2rem(20px)
+  font-size: px2rem(22px)
+  font-weight: bold
 
 .chat-container
   flex: 1
@@ -597,6 +1078,7 @@ export default {
   font-size: px2rem(28px)
   line-height: 1.6
   word-break: break-word
+  white-space: pre-wrap
 
 .message-image
   max-width: px2rem(400px)
@@ -690,6 +1172,36 @@ export default {
     background: #ccc
     cursor: not-allowed
 
+.history-hint-bar
+  display: flex
+  align-items: center
+  padding: px2rem(24px) px2rem(30px)
+  background-color: #fff8e6
+  border-top: 1px solid #ffd700
+  flex-shrink: 0
+
+.hint-icon
+  font-size: px2rem(40px)
+  margin-right: px2rem(16px)
+
+.hint-text
+  font-size: px2rem(26px)
+  color: #8b6914
+  flex: 1
+
+.back-to-current-btn
+  background: linear-gradient(135deg, #06c1ae, #0a9d8c)
+  color: #fff
+  padding: px2rem(16px) px2rem(28px)
+  border-radius: px2rem(12px)
+  font-size: px2rem(26px)
+  font-weight: bold
+  cursor: pointer
+  transition: all 0.2s
+
+  &:active
+    transform: scale(0.98)
+
 .toast
   position: fixed
   top: 50%
@@ -776,10 +1288,15 @@ export default {
   margin-bottom: px2rem(20px)
   cursor: pointer
   transition: all 0.2s
+  border: 2px solid transparent
 
   &:active
     background-color: #f0f9f8
     transform: scale(0.99)
+
+  &.active
+    background-color: #f0f9f8
+    border-color: #06c1ae
 
 .session-info
   flex: 1
