@@ -742,12 +742,12 @@ export default {
         transform: translateY(-50%)
         width: px2rem(8px)
         height: px2rem(32px)
-        background-color: #ff6b00
+        background-color: #06c1ae
         border-radius: px2rem(4px)
 
     .section-more
       font-size: px2rem(26px)
-      color: #ff6b00
+      color: #06c1ae
       cursor: pointer
 
   .coupon-section
@@ -770,11 +770,11 @@ export default {
       width: px2rem(520px)
       margin-right: px2rem(20px)
       display: flex
-      background: linear-gradient(135deg, #fff5f5 0%, #fff 100%)
+      background: linear-gradient(135deg, #f0f9f8 0%, #fff 100%)
       border-radius: px2rem(16px)
       overflow: hidden
       position: relative
-      border: 2px solid #ffe0e0
+      border: 2px solid #e0f5f3
       cursor: pointer
       transition: all 0.3s
 
@@ -783,7 +783,7 @@ export default {
 
       &:hover
         transform: translateY(-2px)
-        box-shadow: 0 px2rem(8px) px2rem(20px) rgba(255, 107, 0, 0.15)
+        box-shadow: 0 px2rem(8px) px2rem(20px) rgba(6, 193, 174, 0.15)
 
       &.coupon-claimed
         opacity: 0.7
@@ -798,7 +798,7 @@ export default {
       align-items: center
       justify-content: center
       padding: px2rem(20px)
-      background: linear-gradient(135deg, #ff6b00 0%, #ff8c33 100%)
+      background: linear-gradient(135deg, #06c1ae 0%, #0a9d8c 100%)
 
       .coupon-value
         display: flex
@@ -870,7 +870,7 @@ export default {
       .coupon-btn
         align-self: flex-start
         padding: px2rem(10px) px2rem(30px)
-        background: linear-gradient(135deg, #ff6b00 0%, #ff8c33 100%)
+        background: linear-gradient(135deg, #06c1ae 0%, #0a9d8c 100%)
         color: #fff
         border: none
         border-radius: px2rem(30px)
@@ -893,10 +893,10 @@ export default {
     .category-card
       display: flex
       justify-content: space-around
-      background: linear-gradient(135deg, #fffbeb 0%, #fff 100%)
+      background: linear-gradient(135deg, #f0f9f8 0%, #fff 100%)
       border-radius: px2rem(16px)
       padding: px2rem(24px) px2rem(16px)
-      border: 2px solid #fef3c7
+      border: 2px solid #e0f5f3
 
     .category-item
       display: flex
@@ -911,10 +911,10 @@ export default {
       &.active
         .category-icon
           transform: scale(1.1)
-          box-shadow: 0 px2rem(8px) px2rem(20px) rgba(255, 107, 0, 0.3)
+          box-shadow: 0 px2rem(8px) px2rem(20px) rgba(6, 193, 174, 0.3)
 
         .category-name
-          color: #ff6b00
+          color: #06c1ae
           font-weight: bold
 
     .category-icon
@@ -924,7 +924,7 @@ export default {
       align-items: center
       justify-content: center
       font-size: px2rem(60px)
-      background: linear-gradient(135deg, #fff5f5 0%, #ffecd2 100%)
+      background: linear-gradient(135deg, #f0f9f8 0%, #e0f5f3 100%)
       border-radius: px2rem(24px)
       margin-bottom: px2rem(12px)
       transition: all 0.3s
@@ -1043,7 +1043,7 @@ export default {
         position: absolute
         top: px2rem(12px)
         right: px2rem(12px)
-        background: linear-gradient(135deg, #ff6b00 0%, #ff9800 100%)
+        background: linear-gradient(135deg, #06c1ae 0%, #0a9d8c 100%)
         color: #fff
         font-size: px2rem(20px)
         font-weight: bold
@@ -1078,8 +1078,8 @@ export default {
       font-size: px2rem(20px)
       padding: px2rem(4px) px2rem(10px)
       border-radius: px2rem(4px)
-      background-color: rgba(255, 107, 0, 0.1)
-      color: #ff6b00
+      background-color: rgba(6, 193, 174, 0.1)
+      color: #06c1ae
 
     .food-tags
       display: flex
@@ -1131,13 +1131,13 @@ export default {
 
       .price-symbol
         font-size: px2rem(22px)
-        color: #ff6b00
+        color: #06c1ae
         margin-right: px2rem(2px)
 
       .price-value
         font-size: px2rem(36px)
         font-weight: bold
-        color: #ff6b00
+        color: #06c1ae
 
     .food-location
       display: flex
@@ -1165,18 +1165,18 @@ export default {
 
       .coupon-tag
         font-size: px2rem(22px)
-        color: #ff6b00
-        background: linear-gradient(135deg, #fff5f5 0%, #fff 100%)
-        border: 1px solid #ffd6cc
+        color: #06c1ae
+        background: linear-gradient(135deg, #f0f9f8 0%, #fff 100%)
+        border: 1px solid #c0e8e4
         padding: px2rem(6px) px2rem(16px)
         border-radius: px2rem(4px)
         cursor: pointer
         transition: all 0.2s
 
         &:hover
-          background: linear-gradient(135deg, #ff6b00 0%, #ff8c33 100%)
+          background: linear-gradient(135deg, #06c1ae 0%, #0a9d8c 100%)
           color: #fff
-          border-color: #ff6b00
+          border-color: #06c1ae
 
     .no-result
       display: flex
@@ -1263,10 +1263,10 @@ export default {
     .modal-coupon-info
       .modal-coupon-card
         display: flex
-        background: linear-gradient(135deg, #fff5f5 0%, #fff 100%)
+        background: linear-gradient(135deg, #f0f9f8 0%, #fff 100%)
         border-radius: px2rem(16px)
         overflow: hidden
-        border: 2px solid #ffe0e0
+        border: 2px solid #e0f5f3
         margin-bottom: px2rem(20px)
 
       .modal-coupon-left
@@ -1276,7 +1276,7 @@ export default {
         align-items: center
         justify-content: center
         padding: px2rem(24px)
-        background: linear-gradient(135deg, #ff6b00 0%, #ff8c33 100%)
+        background: linear-gradient(135deg, #06c1ae 0%, #0a9d8c 100%)
 
         .modal-coupon-value
           display: flex
@@ -1374,7 +1374,7 @@ export default {
         transition: all 0.3s
 
         &.primary
-          background: linear-gradient(135deg, #ff6b00 0%, #ff8c33 100%)
+          background: linear-gradient(135deg, #06c1ae 0%, #0a9d8c 100%)
           color: #fff
 
           &:hover
@@ -1460,9 +1460,9 @@ export default {
           color: #06c1ae
 
         &.hot
-          color: #ff6b00
-          background-color: rgba(255, 107, 0, 0.05)
+          color: #06c1ae
+          background-color: rgba(6, 193, 174, 0.05)
 
           &:hover
-            background-color: rgba(255, 107, 0, 0.1)
+            background-color: rgba(6, 193, 174, 0.1)
 </style>

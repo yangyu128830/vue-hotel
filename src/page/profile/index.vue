@@ -115,6 +115,55 @@
       </div>
     </div>
 
+    <div class="quick-cards-section">
+      <div class="section-header">
+        <span class="section-title">快捷入口</span>
+      </div>
+      <div class="quick-cards">
+        <div class="quick-card favorites-card" @click="goToFavorites">
+          <div class="card-icon">💝</div>
+          <div class="card-content">
+            <div class="card-title">收藏记录</div>
+            <div class="card-stats">
+              <span class="stat-item">
+                <span class="stat-value">{{ favoritesCount }}</span>
+                <span class="stat-label">收藏</span>
+              </span>
+              <span class="stat-divider">|</span>
+              <span class="stat-item">
+                <span class="stat-value">{{ foodFavoritesCount }}</span>
+                <span class="stat-label">美食</span>
+              </span>
+              <span class="stat-divider">|</span>
+              <span class="stat-item">
+                <span class="stat-value">{{ hotelFavoritesCount }}</span>
+                <span class="stat-label">酒店</span>
+              </span>
+            </div>
+          </div>
+          <div class="card-arrow">›</div>
+        </div>
+        <div class="quick-card consumption-card" @click="goToConsumption">
+          <div class="card-icon">📊</div>
+          <div class="card-content">
+            <div class="card-title">消费记录</div>
+            <div class="card-stats">
+              <span class="stat-item">
+                <span class="stat-value">¥{{ monthlyConsumption }}</span>
+                <span class="stat-label">本月消费</span>
+              </span>
+              <span class="stat-divider">|</span>
+              <span class="stat-item">
+                <span class="stat-value">{{ consumptionCount }}</span>
+                <span class="stat-label">笔</span>
+              </span>
+            </div>
+          </div>
+          <div class="card-arrow">›</div>
+        </div>
+      </div>
+    </div>
+
     <div class="settings-section">
       <div class="section-header">
         <span class="section-title">设置</span>
@@ -260,6 +309,21 @@ export default {
     }),
     unreadCount () {
       return 5
+    },
+    favoritesCount () {
+      return 7
+    },
+    foodFavoritesCount () {
+      return 4
+    },
+    hotelFavoritesCount () {
+      return 3
+    },
+    monthlyConsumption () {
+      return '2,994'
+    },
+    consumptionCount () {
+      return 6
     }
   },
   methods: {
@@ -353,6 +417,12 @@ export default {
     },
     goToAccountSecurity () {
       this.$router.push('/account-security')
+    },
+    goToFavorites () {
+      this.$router.push('/favorites')
+    },
+    goToConsumption () {
+      this.$router.push('/consumption')
     },
     showSwitchAccountModal () {
       this.showSwitchAccount = true
@@ -587,6 +657,101 @@ export default {
 
   &:active
     transform: scale(0.98)
+
+.quick-cards-section
+  background-color: #fff
+  margin-top: px2rem(20px)
+  padding: px2rem(30px)
+
+.quick-cards
+  display: flex
+  flex-direction: column
+  gap: px2rem(20px)
+
+.quick-card
+  display: flex
+  align-items: center
+  padding: px2rem(30px)
+  border-radius: px2rem(16px)
+  cursor: pointer
+  transition: all 0.3s
+  position: relative
+  overflow: hidden
+
+  &::before
+    content: ''
+    position: absolute
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%
+    opacity: 0
+    transition: opacity 0.3s
+    background-color: rgba(0, 0, 0, 0.02)
+
+  &:active::before
+    opacity: 1
+
+  &.favorites-card
+    background: linear-gradient(135deg, #fff5f5 0%, #fff 100%)
+    border: 2px solid #ffe0e0
+
+  &.consumption-card
+    background: linear-gradient(135deg, #f0f9f8 0%, #fff 100%)
+    border: 2px solid #e0f5f3
+
+.card-icon
+  width: px2rem(100px)
+  height: px2rem(100px)
+  display: flex
+  align-items: center
+  justify-content: center
+  font-size: px2rem(56px)
+  background: linear-gradient(135deg, rgba(6, 193, 174, 0.1) 0%, rgba(6, 193, 174, 0.05) 100%)
+  border-radius: px2rem(20px)
+  margin-right: px2rem(24px)
+  flex-shrink: 0
+
+.card-content
+  flex: 1
+  min-width: 0
+
+.card-title
+  font-size: px2rem(32px)
+  font-weight: bold
+  color: #333
+  margin-bottom: px2rem(12px)
+
+.card-stats
+  display: flex
+  align-items: center
+  flex-wrap: wrap
+  gap: px2rem(8px)
+
+.stat-item
+  display: flex
+  align-items: baseline
+
+.stat-value
+  font-size: px2rem(32px)
+  font-weight: bold
+  color: #06c1ae
+  margin-right: px2rem(4px)
+
+.stat-label
+  font-size: px2rem(24px)
+  color: #666
+
+.stat-divider
+  font-size: px2rem(24px)
+  color: #ddd
+  margin: 0 px2rem(8px)
+
+.card-arrow
+  font-size: px2rem(40px)
+  color: #ccc
+  flex-shrink: 0
+  margin-left: px2rem(16px)
 
 .settings-list
   border: px2rem(1px) solid #f0f0f0
