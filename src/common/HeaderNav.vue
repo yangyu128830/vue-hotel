@@ -24,9 +24,7 @@ export default {
         { name: '周边游玩', path: '/travel' },
         { name: '周边美食', path: '/food' },
         { name: '会员中心', path: '/member' },
-        { name: '个人中心', path: '/profile' },
-        { name: '收藏记录', path: '/favorites' },
-        { name: '消费记录', path: '/consumption' }
+        { name: '个人中心', path: '/profile' }
       ]
     }
   },
