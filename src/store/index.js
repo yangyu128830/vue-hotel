@@ -19,7 +19,9 @@ const state = {
   checkinDate: '2017-05-05',
   checkoutDate: '2017-05-06',
   keyword: '',
-  lettersConfig: []
+  lettersConfig: [],
+  currentUser: null, // 当前登录用户
+  loggedAccounts: [] // 已登录过的账号列表
 }
 
 export default new Vuex.Store({

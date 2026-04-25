@@ -7,17 +7,16 @@ import Travel from '@/page/travel/index'
 import AttractionDetail from '@/page/attraction-detail/index'
 import Food from '@/page/food/index'
 import FoodDetail from '@/page/food-detail/index'
+import Profile from '@/page/profile/index'
+import Member from '@/page/member/index'
+import Notifications from '@/page/notifications/index'
+import CustomerService from '@/page/customer-service/index'
+import Favorites from '@/page/favorites/index'
+import Consumption from '@/page/consumption/index'
+import Login from '@/page/login/index'
+import AccountSecurity from '@/page/account-security/index'
 
 Vue.use(Router)
-
-const PlaceholderPage = {
-  template: `
-    <div class="placeholder-page">
-      <div class="placeholder-icon">🏗️</div>
-      <div class="placeholder-text">该功能正在开发中...</div>
-    </div>
-  `
-}
 
 export default new Router({
   mode: 'history',
@@ -65,12 +64,42 @@ export default new Router({
     {
       path: '/member',
       name: 'Member',
-      component: PlaceholderPage
+      component: Member
     },
     {
       path: '/profile',
       name: 'Profile',
-      component: PlaceholderPage
+      component: Profile
+    },
+    {
+      path: '/notifications',
+      name: 'Notifications',
+      component: Notifications
+    },
+    {
+      path: '/customer-service',
+      name: 'CustomerService',
+      component: CustomerService
+    },
+    {
+      path: '/favorites',
+      name: 'Favorites',
+      component: Favorites
+    },
+    {
+      path: '/consumption',
+      name: 'Consumption',
+      component: Consumption
+    },
+    {
+      path: '/login',
+      name: 'Login',
+      component: Login
+    },
+    {
+      path: '/account-security',
+      name: 'AccountSecurity',
+      component: AccountSecurity
     }
   ]
 })
