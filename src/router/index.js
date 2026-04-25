@@ -12,6 +12,7 @@ import Profile from '@/page/profile/index'
 import Favorites from '@/page/favorites/index'
 import Consumption from '@/page/consumption/index'
 import Notifications from '@/page/notifications/index'
+import CustomerService from '@/page/customer-service/index'
 
 Vue.use(Router)
 
@@ -82,6 +83,11 @@ export default new Router({
       path: '/notifications',
       name: 'Notifications',
       component: Notifications
+    },
+    {
+      path: '/customer-service',
+      name: 'CustomerService',
+      component: CustomerService
     }
   ]
 })
