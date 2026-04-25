@@ -8,6 +8,9 @@ import AttractionDetail from '@/page/attraction-detail/index'
 import Food from '@/page/food/index'
 import FoodDetail from '@/page/food-detail/index'
 import Member from '@/page/member/index'
+import Profile from '@/page/profile/index'
+import Favorites from '@/page/favorites/index'
+import Consumption from '@/page/consumption/index'
 
 Vue.use(Router)
 
@@ -71,7 +74,17 @@ export default new Router({
     {
       path: '/profile',
       name: 'Profile',
-      component: PlaceholderPage
+      component: Profile
+    },
+    {
+      path: '/favorites',
+      name: 'Favorites',
+      component: Favorites
+    },
+    {
+      path: '/consumption',
+      name: 'Consumption',
+      component: Consumption
     }
   ]
 })
