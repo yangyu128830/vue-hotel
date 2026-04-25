@@ -251,12 +251,10 @@ export default {
         this.showToast('❌', '昵称不能为空')
         return
       }
-      
       if (this.editForm.phone && !this.isValidPhone(this.editForm.phone)) {
         this.showToast('❌', '请输入正确的手机号')
         return
       }
-      
       if (this.editForm.email && !this.isValidEmail(this.editForm.email)) {
         this.showToast('❌', '请输入正确的邮箱格式')
         return
@@ -266,7 +264,6 @@ export default {
         ...this.userInfo,
         ...this.editForm
       }
-      
       this.isEditMode = false
       this.showToast('✅', '修改成功')
     },
