@@ -21,10 +21,9 @@
         <span class="filter-label">时间筛选</span>
         <span class="filter-clear" @click="clearFilter">清除筛选</span>
       </div>
-      
       <div class="filter-quick">
-        <div 
-          v-for="(option, index) in quickOptions" 
+        <div
+          v-for="(option, index) in quickOptions"
           :key="option.value"
           class="quick-option"
           :class="{ active: activeQuickOption === index }"
@@ -33,14 +32,13 @@
           {{ option.label }}
         </div>
       </div>
-      
       <div class="filter-custom">
         <div class="date-range">
           <div class="date-item">
             <span class="date-label">开始日期</span>
-            <input 
-              type="date" 
-              v-model="startDate" 
+            <input
+              type="date"
+              v-model="startDate"
               class="date-input"
               @change="onDateChange"
             />
@@ -48,21 +46,20 @@
           <div class="date-separator">至</div>
           <div class="date-item">
             <span class="date-label">结束日期</span>
-            <input 
-              type="date" 
-              v-model="endDate" 
+            <input
+              type="date"
+              v-model="endDate"
               class="date-input"
               @change="onDateChange"
             />
           </div>
         </div>
       </div>
-      
       <div class="filter-category">
         <span class="category-label">消费类型：</span>
         <div class="category-options">
-          <div 
-            v-for="(cat, index) in categoryOptions" 
+          <div
+            v-for="(cat, index) in categoryOptions"
             :key="cat.value"
             class="category-option"
             :class="{ active: selectedCategory === cat.value }"
@@ -80,7 +77,6 @@
         <span class="records-title">消费记录</span>
         <span class="records-count">共 {{ filteredRecords.length }} 笔</span>
       </div>
-      
       <div class="records-total" v-show="activeQuickOption !== -1 || startDate || selectedCategory !== 'all'">
         <span class="total-label">筛选后金额：</span>
         <span class="total-amount">¥{{ filteredTotal }}</span>
@@ -91,10 +87,9 @@
           <span class="group-date">{{ group.date }}</span>
           <span class="group-amount">¥{{ group.totalAmount }}</span>
         </div>
-        
         <div class="group-records">
-          <div 
-            v-for="(record, recordIndex) in group.records" 
+          <div
+            v-for="(record, recordIndex) in group.records"
             :key="recordIndex"
             class="record-item"
             @click="showRecordDetail(record)"
@@ -133,13 +128,11 @@
           <span class="detail-title">订单详情</span>
           <span class="detail-close" @click="hideDetailModal">✕</span>
         </div>
-        
         <div class="detail-content" v-if="selectedRecord">
           <div class="detail-status">
             <span class="status-icon">✅</span>
             <span class="status-text">已完成</span>
           </div>
-          
           <div class="detail-summary">
             <div class="detail-icon-large" :class="selectedRecord.type">
               <span>{{ getCategoryIcon(selectedRecord.type) }}</span>
@@ -152,7 +145,6 @@
               </div>
             </div>
           </div>
-          
           <div class="detail-list">
             <div class="detail-item">
               <span class="detail-item-label">订单编号</span>
@@ -203,7 +195,6 @@ export default {
   data () {
     const today = new Date()
     const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
-    
     return {
       activeQuickOption: 0,
       startDate: this.formatDate(firstDayOfMonth),
@@ -383,7 +374,6 @@ export default {
       const now = new Date()
       const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
       const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0)
-      
       return this.records
         .filter(r => {
           const date = new Date(r.date)
@@ -397,21 +387,18 @@ export default {
       const thisMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0)
       const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1)
       const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0)
-      
       const thisMonthTotal = this.records
         .filter(r => {
           const date = new Date(r.date)
           return date >= thisMonthStart && date <= thisMonthEnd
         })
         .reduce((sum, r) => sum + r.amount, 0)
-      
       const lastMonthTotal = this.records
         .filter(r => {
           const date = new Date(r.date)
           return date >= lastMonthStart && date <= lastMonthEnd
         })
         .reduce((sum, r) => sum + r.amount, 0)
-      
       return thisMonthTotal >= lastMonthTotal ? 'up' : 'down'
     },
     comparisonAmount () {
@@ -420,41 +407,34 @@ export default {
       const thisMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0)
       const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1)
       const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0)
-      
       const thisMonthTotal = this.records
         .filter(r => {
           const date = new Date(r.date)
           return date >= thisMonthStart && date <= thisMonthEnd
         })
         .reduce((sum, r) => sum + r.amount, 0)
-      
       const lastMonthTotal = this.records
         .filter(r => {
           const date = new Date(r.date)
           return date >= lastMonthStart && date <= lastMonthEnd
         })
         .reduce((sum, r) => sum + r.amount, 0)
-      
       return Math.abs(thisMonthTotal - lastMonthTotal)
     },
     filteredRecords () {
       let result = [...this.records]
-      
       if (this.startDate && this.endDate) {
         const start = new Date(this.startDate)
         const end = new Date(this.endDate)
         end.setHours(23, 59, 59, 999)
-        
         result = result.filter(r => {
           const date = new Date(r.date)
           return date >= start && date <= end
         })
       }
-      
       if (this.selectedCategory !== 'all') {
         result = result.filter(r => r.type === this.selectedCategory)
       }
-      
       return result.sort((a, b) => new Date(b.date) - new Date(a.date))
     },
     filteredTotal () {
@@ -462,7 +442,6 @@ export default {
     },
     groupedRecords () {
       const groups = {}
-      
       this.filteredRecords.forEach(record => {
         const dateStr = this.formatDisplayDate(record.date)
         if (!groups[dateStr]) {
@@ -475,7 +454,6 @@ export default {
         groups[dateStr].totalAmount += record.amount
         groups[dateStr].records.push(record)
       })
-      
       return Object.values(groups).sort((a, b) => {
         const dateA = new Date(a.records[0].date)
         const dateB = new Date(b.records[0].date)
@@ -495,11 +473,9 @@ export default {
       const today = new Date()
       const yesterday = new Date(today)
       yesterday.setDate(yesterday.getDate() - 1)
-      
       const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate())
       const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate())
       const yesterdayOnly = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate())
-      
       if (dateOnly.getTime() === todayOnly.getTime()) {
         return '今天'
       } else if (dateOnly.getTime() === yesterdayOnly.getTime()) {
@@ -513,7 +489,6 @@ export default {
       this.activeQuickOption = index
       const now = new Date()
       let startDate, endDate
-      
       switch (index) {
         case 0:
           startDate = this.formatDate(now)
@@ -542,7 +517,6 @@ export default {
           endDate = this.formatDate(now)
           break
       }
-      
       this.startDate = startDate
       this.endDate = endDate
     },

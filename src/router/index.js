@@ -14,15 +14,6 @@ import Consumption from '@/page/consumption/index'
 
 Vue.use(Router)
 
-const PlaceholderPage = {
-  template: `
-    <div class="placeholder-page">
-      <div class="placeholder-icon">🏗️</div>
-      <div class="placeholder-text">该功能正在开发中...</div>
-    </div>
-  `
-}
-
 export default new Router({
   mode: 'hash',
   routes: [
