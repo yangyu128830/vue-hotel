@@ -7,17 +7,20 @@ import Travel from '@/page/travel/index'
 import AttractionDetail from '@/page/attraction-detail/index'
 import Food from '@/page/food/index'
 import FoodDetail from '@/page/food-detail/index'
-import Member from '@/page/member/index'
-import Profile from '@/page/profile/index'
-import Favorites from '@/page/favorites/index'
-import Consumption from '@/page/consumption/index'
-import Notifications from '@/page/notifications/index'
-import CustomerService from '@/page/customer-service/index'
 
 Vue.use(Router)
 
+const PlaceholderPage = {
+  template: `
+    <div class="placeholder-page">
+      <div class="placeholder-icon">🏗️</div>
+      <div class="placeholder-text">该功能正在开发中...</div>
+    </div>
+  `
+}
+
 export default new Router({
-  mode: 'hash',
+  mode: 'history',
   routes: [
     {
       path: '/',
@@ -62,32 +65,12 @@ export default new Router({
     {
       path: '/member',
       name: 'Member',
-      component: Member
+      component: PlaceholderPage
     },
     {
       path: '/profile',
       name: 'Profile',
-      component: Profile
-    },
-    {
-      path: '/favorites',
-      name: 'Favorites',
-      component: Favorites
-    },
-    {
-      path: '/consumption',
-      name: 'Consumption',
-      component: Consumption
-    },
-    {
-      path: '/notifications',
-      name: 'Notifications',
-      component: Notifications
-    },
-    {
-      path: '/customer-service',
-      name: 'CustomerService',
-      component: CustomerService
+      component: PlaceholderPage
     }
   ]
 })
